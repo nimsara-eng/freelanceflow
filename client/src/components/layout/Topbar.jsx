@@ -69,7 +69,7 @@ export default function Topbar({
 
         <div
           aria-hidden="true"
-          className="flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-brand to-fuchsia-500 text-sm font-semibold text-white"
+          className="flex size-9 items-center justify-center rounded-full bg-linear-to-br from-brand to-fuchsia-500 text-sm font-semibold text-white"
         >
           F
         </div>
