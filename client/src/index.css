@@ -1,11 +1,50 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@import "tailwindcss";
+
+@theme {
+  --color-sidebar: #2a1263;
+  --color-bg: #f4f0ff;
+  --color-surface: #ffffff;
+  --color-surface-2: #faf8ff;
+  --color-border: #e4dcff;
+  --color-text: #1b1235;
+  --color-muted: #6b6490;
+  --color-brand: #7c3aed;
+  --color-brand-hover: #6d28d9;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+
+  --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
 }
 
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f5f7fb;
-  color: #111827;
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  background-image: radial-gradient(
+    60rem 30rem at 80% -10%,
+    rgb(124 58 237 / 0.1),
+    transparent 60%
+  );
+  background-attachment: fixed;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 3px;
+}
+
+aside :focus-visible {
+  outline-color: #c4b5fd;
 }
