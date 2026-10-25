@@ -14,7 +14,7 @@
   --color-warning: #d97706;
   --color-danger: #dc2626;
 
-  --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
 }
 
 body {

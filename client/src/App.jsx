@@ -1,5 +1,11 @@
 import { Link, Route, Routes } from 'react-router-dom'
 import AppLayout from './components/layout/AppLayout'
+import UiPreview from './pages/UiPreview'
+import Dashboard from './pages/Dashboard'
+import Projects from './pages/Projects'
+import Clients from './pages/Clients'
+import TimeTracking from './pages/TimeTracking'
+import Invoices from './pages/Invoices'
 
 function PlaceholderPage({ title, description }) {
   return (
@@ -44,55 +50,16 @@ export default function App() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
-        <Route
-          index
-          element={
-            <PlaceholderPage
-              title="Dashboard"
-              description="An overview of your freelance work."
-            />
-          }
-        />
 
-        <Route
-          path="clients"
-          element={
-            <PlaceholderPage
-              title="Clients"
-              description="Manage your clients and their contact details."
-            />
-          }
-        />
+        <Route index element={<Dashboard />} />
 
-        <Route
-          path="projects"
-          element={
-            <PlaceholderPage
-              title="Projects"
-              description="Organize projects, deadlines, and progress."
-            />
-          }
-        />
+        <Route path="clients" element={<Clients />} />
 
-        <Route
-          path="time"
-          element={
-            <PlaceholderPage
-              title="Time Tracking"
-              description="Track the time you spend on project tasks."
-            />
-          }
-        />
+        <Route path="projects" element={<Projects />} />
 
-        <Route
-          path="invoices"
-          element={
-            <PlaceholderPage
-              title="Invoices"
-              description="Manage invoices and payment records."
-            />
-          }
-        />
+        <Route path="time" element={<TimeTracking />} />
+
+        <Route path="invoices" element={<Invoices />} />
 
         <Route
           path="settings"
@@ -103,6 +70,10 @@ export default function App() {
             />
           }
         />
+
+        {import.meta.env.DEV && (
+          <Route path="ui-preview" element={<UiPreview />} />
+        )}
 
         <Route path="*" element={<NotFoundPage />} />
       </Route>
