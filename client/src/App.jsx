@@ -4,7 +4,7 @@ import AppLayout from './components/layout/AppLayout'
 import Clients from './pages/Clients'
 import Dashboard from './pages/Dashboard'
 import Invoices from './pages/Invoices'
-import Projects from './pages/Projects'
+
 import UiPreview from './pages/UiPreview'
 import Auth from './pages/Auth'
 import ClientHome from './pages/ClientHome'
@@ -13,6 +13,7 @@ import AuthProvider from './features/auth/AuthProvider'
 import AccountGate from './features/auth/AccountGate'
 import { useAuth } from './features/auth/useAuth'
 
+const Projects = lazy(() => import('./pages/Projects'))
 const Settings = lazy(() => import('./pages/Settings'))
 const TimeTracking = lazy(() => import('./pages/TimeTracking'))
 
@@ -53,7 +54,7 @@ export default function App() {
         <Route index element={<WorkspaceHome />} />
         <Route element={<AccountGate freelancerOnly />}>
         <Route path="clients" element={<Clients />} />
-        <Route path="projects" element={<Projects />} />
+        <Route path="projects" element={<Suspense fallback={<p role="status" className="text-sm text-muted">Opening projects…</p>}><Projects /></Suspense>} />
         <Route path="time" element={<Suspense fallback={<p role="status" className="text-sm text-muted">Opening time tracking…</p>}><TimeTracking /></Suspense>} />
         <Route path="invoices" element={<Invoices />} />
         </Route>
