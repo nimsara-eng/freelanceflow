@@ -10,6 +10,8 @@ import { connectDB } from './config/db.js'
 import User from './models/User.js'
 import FreelancerProfile from './models/FreelancerProfile.js'
 import Asset from './models/Asset.js'
+import Project from './models/Project.js'
+import projectRoutes from './routes/projects.js'
 import authRoutes from './routes/auth.js'
 import profileRoutes from './routes/profile.js'
 import freelancerRoutes from './routes/freelancers.js'
@@ -24,7 +26,7 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invali
 const origins = configuredOrigins()
 
 await connectDB()
-await Promise.all([User.init(), FreelancerProfile.init(), Asset.init()])
+await Promise.all([User.init(), FreelancerProfile.init(), Asset.init(), Project.init()])
 
 const app = express()
 app.disable('x-powered-by')
@@ -51,6 +53,7 @@ app.get('/api/health', (_req, res) => res.json({ success: true, message: 'Freela
 app.use('/api/auth', authRoutes)
 app.use('/api/profile', profileRoutes)
 app.use('/api/freelancers', freelancerRoutes)
+app.use('/api/projects', projectRoutes)
 app.use(notFound)
 app.use(errorHandler)
 

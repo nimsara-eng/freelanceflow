@@ -8,7 +8,8 @@
     "dev": "node --watch server.js",
     "start": "node server.js",
     "test:auth": "node --test test/auth-foundation.test.js",
-    "test:media": "node --test test/profile-media.test.js"
+    "test:media": "node --test test/profile-media.test.js",
+    "test:projects": "node --test test/projects.test.js"
   },
   "keywords": [],
   "author": "",
