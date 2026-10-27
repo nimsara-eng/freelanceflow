@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node --watch server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test:auth": "node --test test/auth-foundation.test.js",
+    "test:media": "node --test test/profile-media.test.js"
   },
   "keywords": [],
   "author": "",
