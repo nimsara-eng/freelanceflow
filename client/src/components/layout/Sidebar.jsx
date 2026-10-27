@@ -9,7 +9,9 @@ import {
   Users,
   X,
   Zap,
+  Search,
 } from 'lucide-react'
+import { useAuth } from '../../features/auth/useAuth'
 
 const navigation = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -21,6 +23,12 @@ const navigation = [
 ]
 
 function SidebarContent({ idPrefix, onNavigate, onClose }) {
+  const { workspace } = useAuth()
+  const links = workspace === 'freelancer' ? navigation : [
+    { to: '/', label: 'Overview', icon: LayoutDashboard },
+    { to: '/find-freelancer', label: 'Find a freelancer', icon: Search },
+    { to: '/settings', label: 'Settings', icon: Settings },
+  ]
   const reduceMotion = useReducedMotion()
   const pillTransition = reduceMotion
     ? { duration: 0 }
@@ -53,7 +61,7 @@ function SidebarContent({ idPrefix, onNavigate, onClose }) {
         aria-label="Main navigation"
         className="flex-1 space-y-1 overflow-y-auto p-4"
       >
-        {navigation.map(({ to, label, icon: Icon }) => (
+        {links.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
@@ -91,7 +99,7 @@ function SidebarContent({ idPrefix, onNavigate, onClose }) {
       </nav>
 
       <div className="border-t border-white/10 px-6 py-4">
-        <p className="text-xs text-white/50">Smart Freelance Management</p>
+        <p className="text-xs text-white/70">{workspace === 'freelancer' ? 'Freelancer workspace' : 'Client workspace'}</p>
       </div>
     </>
   )

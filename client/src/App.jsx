@@ -1,36 +1,32 @@
 import { Link, Route, Routes } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 import AppLayout from './components/layout/AppLayout'
-import UiPreview from './pages/UiPreview'
-import Dashboard from './pages/Dashboard'
-import Projects from './pages/Projects'
 import Clients from './pages/Clients'
-import TimeTracking from './pages/TimeTracking'
+import Dashboard from './pages/Dashboard'
 import Invoices from './pages/Invoices'
+import Projects from './pages/Projects'
+import UiPreview from './pages/UiPreview'
+import Auth from './pages/Auth'
+import ClientHome from './pages/ClientHome'
+import FindFreelancer from './pages/FindFreelancer'
+import AuthProvider from './features/auth/AuthProvider'
+import AccountGate from './features/auth/AccountGate'
+import { useAuth } from './features/auth/useAuth'
 
-function PlaceholderPage({ title, description }) {
-  return (
-    <section>
-      <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-        {title}
-      </h1>
+const Settings = lazy(() => import('./pages/Settings'))
+const TimeTracking = lazy(() => import('./pages/TimeTracking'))
 
-      <p className="mt-2 max-w-2xl text-muted">
-        {description}
-      </p>
-
-      <div className="mt-6 rounded-2xl border border-border bg-surface p-6">
-        <p className="text-sm text-muted">
-          This section is under development.
-        </p>
-      </div>
-    </section>
-  )
+function WorkspaceHome() {
+  const { workspace } = useAuth()
+  return workspace === 'freelancer' ? <Dashboard /> : <ClientHome />
 }
 
 function NotFoundPage() {
   return (
     <section>
-      <h1 className="text-2xl font-semibold">Page not found</h1>
+      <h1 className="text-2xl font-semibold">
+        Page not found
+      </h1>
 
       <p className="mt-2 text-muted">
         The page you requested does not exist.
@@ -48,28 +44,22 @@ function NotFoundPage() {
 
 export default function App() {
   return (
+    <AuthProvider>
     <Routes>
+      <Route path="login" element={<Auth key="login" mode="login" />} />
+      <Route path="signup" element={<Auth key="signup" mode="register" />} />
+      <Route element={<AccountGate />}>
       <Route element={<AppLayout />}>
-
-        <Route index element={<Dashboard />} />
-
+        <Route index element={<WorkspaceHome />} />
+        <Route element={<AccountGate freelancerOnly />}>
         <Route path="clients" element={<Clients />} />
-
         <Route path="projects" element={<Projects />} />
-
-        <Route path="time" element={<TimeTracking />} />
-
+        <Route path="time" element={<Suspense fallback={<p role="status" className="text-sm text-muted">Opening time tracking…</p>}><TimeTracking /></Suspense>} />
         <Route path="invoices" element={<Invoices />} />
-
-        <Route
-          path="settings"
-          element={
-            <PlaceholderPage
-              title="Settings"
-              description="Manage your profile and workspace preferences."
-            />
-          }
-        />
+        </Route>
+        <Route path="find-freelancer" element={<FindFreelancer />} />
+        <Route path="freelancers/:freelancerId" element={<FindFreelancer />} />
+        <Route path="settings" element={<Suspense fallback={<p role="status" className="text-sm text-muted">Opening settings…</p>}><Settings /></Suspense>} />
 
         {import.meta.env.DEV && (
           <Route path="ui-preview" element={<UiPreview />} />
@@ -77,6 +67,8 @@ export default function App() {
 
         <Route path="*" element={<NotFoundPage />} />
       </Route>
+      </Route>
     </Routes>
+    </AuthProvider>
   )
 }

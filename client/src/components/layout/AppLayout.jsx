@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import PageWrapper from './PageWrapper'
 import Sidebar from './Sidebar'
@@ -9,6 +9,10 @@ export default function AppLayout() {
   const menuButtonRef = useRef(null)
   const mainRef = useRef(null)
   const location = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location.pathname, location.search])
 
   function handleNavigate() {
     setSidebarOpen(false)

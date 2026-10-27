@@ -1,6 +1,5 @@
 import { useState } from 'react'
-
-const storageKey = 'freelanceflow:time-preview:v1'
+import { useAuth } from '../auth/useAuth'
 
 function emptyState() {
   return {
@@ -18,7 +17,7 @@ function isValidTimer(value) {
   )
 }
 
-function readStoredState() {
+function readStoredState(storageKey) {
   try {
     const stored = sessionStorage.getItem(storageKey)
 
@@ -48,7 +47,9 @@ function readStoredState() {
 }
 
 export default function useTimeTracking() {
-  const [state, setState] = useState(readStoredState)
+  const { user } = useAuth()
+  const storageKey = `freelanceflow:time-preview:v1:${user.id}`
+  const [state, setState] = useState(() => readStoredState(storageKey))
   const [error, setError] = useState('')
 
   function saveState(nextState) {

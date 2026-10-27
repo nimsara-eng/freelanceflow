@@ -1,79 +1,52 @@
-import { Bell, Menu, Search, X } from 'lucide-react'
-import { useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import { ArrowLeftRight, LogOut, Menu, X } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import Button from '../ui/Button'
+import Avatar from '../ui/Avatar'
+import { useAuth } from '../../features/auth/useAuth'
 
 const titles = {
-  '/': 'Dashboard',
-  '/clients': 'Clients',
-  '/projects': 'Projects',
-  '/time': 'Time Tracking',
-  '/invoices': 'Invoices',
-  '/settings': 'Settings',
+  '/clients': 'Clients', '/projects': 'Projects', '/time': 'Time Tracking',
+  '/invoices': 'Invoices', '/settings': 'Settings', '/find-freelancer': 'Find a freelancer',
 }
 
-export default function Topbar({
-  sidebarOpen,
-  onMenuToggle,
-  menuButtonRef,
-}) {
+export default function Topbar({ sidebarOpen, onMenuToggle, menuButtonRef }) {
   const { pathname } = useLocation()
-  const title = titles[pathname] ?? 'FreelanceFlow'
+  const navigate = useNavigate()
+  const { user, workspace, switchWorkspace, signOut } = useAuth()
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const title = pathname === '/' ? (workspace === 'freelancer' ? 'Dashboard' : 'Overview') : titles[pathname] ?? 'FreelanceFlow'
+
+  async function logout() {
+    setBusy(true)
+    setError('')
+    try {
+      await signOut()
+      navigate('/login', { replace: true })
+    } catch (failure) { setError(failure.message) }
+    finally { setBusy(false) }
+  }
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-bg/80 px-4 backdrop-blur-md sm:px-6">
-      <button
-        ref={menuButtonRef}
-        type="button"
-        onClick={onMenuToggle}
-        aria-label={sidebarOpen ? 'Close navigation' : 'Open navigation'}
-        aria-expanded={sidebarOpen}
-        aria-controls="app-sidebar"
-        className="rounded-lg p-2 text-muted transition-colors hover:bg-surface-2 hover:text-text lg:hidden"
-      >
-        {sidebarOpen ? (
-          <X size={22} aria-hidden="true" />
-        ) : (
-          <Menu size={22} aria-hidden="true" />
-        )}
-      </button>
-
-      <div className="min-w-0">
-        <p className="truncate text-sm font-semibold">{title}</p>
-        <p className="hidden text-xs text-muted sm:block">
-          Smart Freelance Management
-        </p>
-      </div>
-
-      <div className="relative ml-auto hidden w-full max-w-xs md:block">
-        <Search
-          size={16}
-          aria-hidden="true"
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-        />
-        <input
-          type="search"
-          aria-label="Search"
-          placeholder="Search clients, projects..."
-          className="w-full rounded-xl border border-border bg-surface py-2 pl-9 pr-3 text-sm placeholder:text-muted focus:border-brand"
-        />
-      </div>
-
-      <div className="ml-auto flex items-center gap-2 md:ml-0">
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="relative rounded-lg p-2 text-muted transition-colors hover:bg-surface-2 hover:text-text"
-        >
-          <Bell size={20} aria-hidden="true" />
-          <span className="absolute right-2 top-2 size-2 rounded-full bg-brand" />
+    <header className="sticky top-0 z-20 border-b border-border bg-bg/95 backdrop-blur-md">
+      <div className="flex min-h-18 flex-wrap items-center gap-3 px-4 py-3 sm:px-6">
+        <button ref={menuButtonRef} type="button" onClick={onMenuToggle} aria-label={sidebarOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={sidebarOpen} aria-controls="app-sidebar" className="rounded-lg p-2 text-muted hover:bg-surface-2 hover:text-text lg:hidden">
+          {sidebarOpen ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
         </button>
-
-        <div
-          aria-hidden="true"
-          className="flex size-9 items-center justify-center rounded-full bg-linear-to-br from-brand to-fuchsia-500 text-sm font-semibold text-white"
-        >
-          F
-        </div>
+        <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{title}</p><p className="mt-1 text-xs text-muted">{workspace === 'freelancer' ? 'Freelancer workspace' : 'Client workspace'}</p></div>
+        <Link to="/settings" aria-label={`Account settings for ${user.displayName}`} className="flex min-w-0 items-center gap-2 rounded-full">
+          <Avatar src={user.avatarUrl} name={user.displayName} className="size-9 text-xs" />
+          <span className="hidden max-w-36 truncate text-xs font-medium xl:block">{user.displayName}</span>
+        </Link>
+        <Button variant="ghost" size="sm" loading={busy} onClick={logout} aria-label="Sign out"><LogOut size={18} aria-hidden="true" /><span className="hidden sm:inline">Sign out</span></Button>
+        {user.roles.includes('freelancer') && (
+          <Button variant="secondary" size="sm" disabled={busy} className="order-last w-full sm:order-0 sm:w-auto" onClick={() => { switchWorkspace(workspace === 'freelancer' ? 'client' : 'freelancer'); navigate('/'); }}>
+            <ArrowLeftRight size={16} aria-hidden="true" />Switch to {workspace === 'freelancer' ? 'Client' : 'Freelancer'}
+          </Button>
+        )}
       </div>
+      {error && <p role="alert" className="px-6 pb-3 text-sm text-danger">{error}</p>}
     </header>
   )
 }
