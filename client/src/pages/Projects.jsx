@@ -8,6 +8,7 @@ import Input from '../components/ui/Input'
 import Modal from '../components/ui/Modal'
 import { sampleProjects } from '../features/dashboard/sampleProjects'
 import { useSearchParams } from 'react-router-dom'
+import { readPreferences } from '../features/settings/preferences'
 
 const statuses = {
   active: { label: 'In progress', tone: 'brand' },
@@ -63,7 +64,8 @@ export default function Projects() {
   const clientFilter = searchParams.get('client')?.trim() ?? ''
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('all')
-  const [sort, setSort] = useState('due-date')
+  const [defaultSort] = useState(() => readPreferences().projectSort)
+  const [sort, setSort] = useState(defaultSort)
   const [selectedProject, setSelectedProject] = useState(null)
 
   const searchTerm = search.trim().toLowerCase()
@@ -95,7 +97,7 @@ export default function Projects() {
   function clearFilters() {
     setSearch('')
     setStatus('all')
-    setSort('due-date')
+    setSort(defaultSort)
 
     setSearchParams((currentParams) => {
       const nextParams = new URLSearchParams(currentParams)
@@ -199,7 +201,7 @@ export default function Projects() {
           Showing {visibleProjects.length} of {sampleProjects.length} projects
         </p>
 
-        {(search || status !== 'all' || sort !== 'due-date' || clientFilter) && (
+        {(search || status !== 'all' || sort !== defaultSort || clientFilter) && (
           <Button variant="ghost" size="sm" onClick={clearFilters}>
             Reset filters
           </Button>

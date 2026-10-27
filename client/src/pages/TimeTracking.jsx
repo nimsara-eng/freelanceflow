@@ -8,6 +8,7 @@ import Input from '../components/ui/Input'
 import Modal from '../components/ui/Modal'
 import { sampleProjects } from '../features/dashboard/sampleProjects'
 import useTimeTracking from '../features/time/useTimeTracking'
+import { readPreferences } from '../features/settings/preferences'
 
 function formatDuration(milliseconds) {
   const totalSeconds = Math.floor(milliseconds / 1000)
@@ -20,13 +21,14 @@ function formatDuration(milliseconds) {
     .join(':')
 }
 
-function formatStartedAt(timestamp) {
+function formatStartedAt(timestamp, preferences) {
   return new Intl.DateTimeFormat('en-LK', {
-    timeZone: 'Asia/Colombo',
+    timeZone: preferences.timeZone,
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    hourCycle: preferences.timeFormat === '24h' ? 'h23' : 'h12',
   }).format(new Date(timestamp))
 }
 
@@ -39,6 +41,7 @@ function getProjectName(projectId) {
 export default function TimeTracking() {
   const projectSelectId = useId()
   const activityRef = useRef(null)
+  const [preferences] = useState(readPreferences)
 
   const {
     active,
@@ -274,7 +277,7 @@ export default function TimeTracking() {
           </h2>
 
           <span className="text-xs text-muted">
-            Dates shown in Colombo time
+            Dates shown in {preferences.timeZone === 'UTC' ? 'UTC' : 'Sri Lanka time'}
           </span>
         </div>
 
@@ -309,7 +312,7 @@ export default function TimeTracking() {
                   </p>
 
                   <p className="mt-2 text-xs text-muted">
-                    Started {formatStartedAt(entry.startedAt)}
+                    Started {formatStartedAt(entry.startedAt, preferences)}
                   </p>
                 </div>
 
