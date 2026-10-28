@@ -6,6 +6,7 @@ import Avatar from '../ui/Avatar'
 import { useAuth } from '../../features/auth/useAuth'
 
 const titles = {
+  '/collaborations': 'My projects', '/invitations': 'Project invitation',
   '/clients': 'Clients', '/projects': 'Projects', '/time': 'Time Tracking',
   '/invoices': 'Invoices', '/settings': 'Settings', '/find-freelancer': 'Find a freelancer',
 }

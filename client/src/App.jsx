@@ -8,10 +8,13 @@ import Invoices from './pages/Invoices'
 import UiPreview from './pages/UiPreview'
 import Auth from './pages/Auth'
 import ClientHome from './pages/ClientHome'
+import ClientProjects from './pages/ClientProjects'
 import FindFreelancer from './pages/FindFreelancer'
 import AuthProvider from './features/auth/AuthProvider'
 import AccountGate from './features/auth/AccountGate'
 import { useAuth } from './features/auth/useAuth'
+
+const Invitation = lazy(() => import('./pages/Invitation'))
 
 const Projects = lazy(() => import('./pages/Projects'))
 const Settings = lazy(() => import('./pages/Settings'))
@@ -58,6 +61,8 @@ export default function App() {
         <Route path="time" element={<Suspense fallback={<p role="status" className="text-sm text-muted">Opening time tracking…</p>}><TimeTracking /></Suspense>} />
         <Route path="invoices" element={<Invoices />} />
         </Route>
+        <Route path="invitations" element={<Suspense fallback={<p role="status" className="text-sm text-muted">Opening invitation…</p>}><Invitation /></Suspense>} />
+        <Route path="collaborations" element={<ClientProjects />} />
         <Route path="find-freelancer" element={<FindFreelancer />} />
         <Route path="freelancers/:freelancerId" element={<FindFreelancer />} />
         <Route path="settings" element={<Suspense fallback={<p role="status" className="text-sm text-muted">Opening settings…</p>}><Settings /></Suspense>} />

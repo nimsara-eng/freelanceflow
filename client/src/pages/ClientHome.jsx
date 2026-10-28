@@ -1,5 +1,6 @@
-import { ArrowUpRight, FolderKanban, Search } from 'lucide-react'
+import { ArrowUpRight, Search } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import ClientProjects from './ClientProjects'
 import Card from '../components/ui/Card'
 import { useAuth } from '../features/auth/useAuth'
 
@@ -22,10 +23,7 @@ export default function ClientHome() {
           <Link to="/find-freelancer" className="inline-flex min-h-11 shrink-0 items-center gap-3 rounded-full bg-brand px-5 text-sm font-semibold text-white hover:bg-brand-hover">Find a freelancer<ArrowUpRight size={18} aria-hidden="true" /></Link>
         </div>
       </Card>
-      <Card>
-        <div className="flex items-center gap-3"><FolderKanban size={21} className="text-brand" aria-hidden="true" /><h2 className="text-lg font-semibold">Your collaborations</h2></div>
-        <p className="mt-4 max-w-xl text-sm leading-7 text-muted">Project invitations, progress reviews and prototype comments are coming in the collaboration stage. No client projects are connected yet.</p>
-      </Card>
+      <ClientProjects embedded />
     </section>
   )
 }

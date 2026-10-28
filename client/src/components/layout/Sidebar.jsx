@@ -26,6 +26,7 @@ function SidebarContent({ idPrefix, onNavigate, onClose }) {
   const { workspace } = useAuth()
   const links = workspace === 'freelancer' ? navigation : [
     { to: '/', label: 'Overview', icon: LayoutDashboard },
+    { to: '/collaborations', label: 'My projects', icon: FolderKanban },
     { to: '/find-freelancer', label: 'Find a freelancer', icon: Search },
     { to: '/settings', label: 'Settings', icon: Settings },
   ]
