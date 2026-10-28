@@ -1,3 +1,4 @@
+import { collaborationDto } from './invitations.js'
 import { httpError } from './httpError.js'
 
 const statuses = ['active', 'review', 'completed']
@@ -47,5 +48,5 @@ export function parseProjectQuery(query, owner) {
   return { filter, sort: sort === 'name' ? { name: 1, _id: 1 } : { dueDate: 1, _id: 1 }, page: Number(page), limit: Number(limit) }
 }
 export function projectDto(project) {
-  return { id: String(project._id), name: project.name, client: project.client, description: project.description, dueDate: project.dueDate, status: project.status, version: project.__v, createdAt: project.createdAt, updatedAt: project.updatedAt }
+  return { id: String(project._id), name: project.name, client: project.client, description: project.description, dueDate: project.dueDate, status: project.status, version: project.__v, collaboration: collaborationDto(project), createdAt: project.createdAt, updatedAt: project.updatedAt }
 }

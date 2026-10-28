@@ -11,6 +11,7 @@ import User from './models/User.js'
 import FreelancerProfile from './models/FreelancerProfile.js'
 import Asset from './models/Asset.js'
 import Project from './models/Project.js'
+import collaborationRoutes from './routes/collaboration.js'
 import projectRoutes from './routes/projects.js'
 import authRoutes from './routes/auth.js'
 import profileRoutes from './routes/profile.js'
@@ -54,6 +55,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/profile', profileRoutes)
 app.use('/api/freelancers', freelancerRoutes)
 app.use('/api/projects', projectRoutes)
+app.use('/api/collaboration', collaborationRoutes)
 app.use(notFound)
 app.use(errorHandler)
 

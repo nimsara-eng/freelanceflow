@@ -1,3 +1,4 @@
+import { addProjectInvitations } from './projectInvitations.js'
 import { Router } from 'express'
 import mongoose from 'mongoose'
 import { rateLimit } from 'express-rate-limit'
@@ -31,6 +32,8 @@ router.param('id', (req, _res, next, id) => {
   if (!mongoose.isObjectIdOrHexString(id)) throw httpError(404, 'Project not found.')
   next()
 })
+addProjectInvitations(router, writes)
+
 router.get('/:id', async (req, res) => {
   const project = await Project.findOne({ _id: req.params.id, owner: req.user._id }).lean()
   if (!project) throw httpError(404, 'Project not found.')
