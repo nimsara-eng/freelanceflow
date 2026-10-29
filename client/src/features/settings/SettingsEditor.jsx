@@ -63,7 +63,7 @@ export default function SettingsEditor({ initial }) {
           <div hidden={section !== 'profile'}><PersonalProfileForm initial={initial.user} report={(status) => report('profile', status)} /></div>
           <div hidden={section !== 'media'}><MediaPanel report={(status) => report('media', status)} /></div>
           {initial.freelancerProfile && <>
-            <div hidden={section !== 'freelancer'}><ProfessionalProfileForm initial={initial.freelancerProfile} report={(status) => report('freelancer', status)} /></div>
+            <div hidden={section !== 'freelancer'}><ProfessionalProfileForm publicationDisabled={dirty || busy} initial={initial.freelancerProfile} report={(status) => report('freelancer', status)} /></div>
             <div hidden={section !== 'sharing'}><SharingPanel profile={freelancerProfile ?? initial.freelancerProfile} /></div>
           </>}
           <div hidden={section !== 'security'}><SecurityForm report={(status) => report('security', status)} /></div>

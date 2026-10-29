@@ -55,7 +55,7 @@ export default function FindFreelancer() {
         </form>
       </Card>
       {freelancerId && !current && <p role="status" className="text-sm text-muted">Looking for this freelancer…</p>}
-      {current?.error && <Card><p role="alert" className="text-sm">{current.error}</p><p className="mt-3 text-xs leading-6 text-muted">The profile may be private or not published yet. New profiles require email verification before publishing.</p></Card>}
+      {current?.error && <Card><p role="alert" className="text-sm">{current.error}</p><p className="mt-3 text-xs leading-6 text-muted">The profile may be private, unpublished or unavailable. Ask the freelancer to publish it from Settings → Freelancer profile and share their exact ID.</p></Card>}
       {profile && (
         <Card>
           <div className="mb-5"><Avatar src={profile.avatarUrl} name={profile.displayName} className="size-20 text-xl" /></div>

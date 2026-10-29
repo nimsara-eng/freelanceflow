@@ -20,7 +20,6 @@ export function professionalDraft(profile) {
     services: (profile.services ?? []).join('\n'), githubUrl: profile.githubUrl ?? '',
     linkedinUrl: profile.linkedinUrl ?? '', portfolioUrl: profile.portfolioUrl ?? '',
     publicCity: profile.publicLocation?.city ?? '', publicCountry: profile.publicLocation?.country ?? '',
-    visibility: profile.visibility ?? 'private',
   }
 }
 
@@ -39,7 +38,7 @@ export function validatePersonal(draft) {
   return { errors, input: { displayName, bio: draft.bio.trim(), address: Object.fromEntries(Object.entries(draft.address).map(([key, value]) => [key, value.trim()])) } }
 }
 
-export function validateProfessional(draft, emailVerified) {
+export function validateProfessional(draft) {
   const errors = {}
   const skills = cleanList(draft.skills, ',')
   const services = cleanList(draft.services, '\n')
@@ -56,13 +55,12 @@ export function validateProfessional(draft, emailVerified) {
   }
   if (draft.publicCity.trim().length > 80) errors.publicCity = 'Keep the city within 80 characters.'
   if (draft.publicCountry.trim().length > 80) errors.publicCountry = 'Keep the country within 80 characters.'
-  if (!['private', 'published'].includes(draft.visibility) || (draft.visibility === 'published' && !emailVerified)) errors.visibility = 'Verify your email before publishing your profile.'
   return {
     errors,
     input: {
       headline: draft.headline.trim(), skills, services,
       githubUrl: draft.githubUrl.trim(), linkedinUrl: draft.linkedinUrl.trim(), portfolioUrl: draft.portfolioUrl.trim(),
-      publicLocation: { city: draft.publicCity.trim(), country: draft.publicCountry.trim() }, visibility: draft.visibility,
+      publicLocation: { city: draft.publicCity.trim(), country: draft.publicCountry.trim() },
     },
   }
 }
