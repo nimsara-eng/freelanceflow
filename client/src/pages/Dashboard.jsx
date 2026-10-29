@@ -4,6 +4,7 @@ import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import EmptyState from '../components/ui/EmptyState'
+import TaskProgress from '../features/projects/TaskProgress'
 import { useProjects } from '../features/projects/useProjects'
 
 const statusDetails = {
@@ -41,7 +42,7 @@ export default function Dashboard() {
             {loading ? <p role="status" className="mt-5 text-sm text-muted">Loading your workspace…</p> : featured ? <>
               <h2 className="mt-5 max-w-sm wrap-break-word text-3xl font-semibold tracking-tight">{featured.name}</h2><p className="mt-2 wrap-break-word text-sm text-muted">{featured.client}</p><p className="mt-4 max-w-md line-clamp-3 whitespace-pre-wrap wrap-break-word text-sm leading-7 text-text/80">{featured.description || 'A new project, ready for your ideas.'}</p>
               <div className="mt-6 flex flex-wrap items-center gap-4"><Badge tone={statusDetails[featured.status].tone} dot>{statusDetails[featured.status].label}</Badge><span className="inline-flex items-center gap-2 text-xs text-muted"><CalendarDays size={15} aria-hidden="true" />{formatDate(featured.dueDate)}</span></div>
-              <Button className="mt-7" onClick={() => viewProject(featured)}>View project details<ArrowUpRight size={17} aria-hidden="true" /></Button>
+              <div className="mt-5 max-w-md"><TaskProgress progress={featured.progress} name={featured.name} /></div><Button className="mt-7" onClick={() => viewProject(featured)}>View project details<ArrowUpRight size={17} aria-hidden="true" /></Button>
             </> : <><h2 className="mt-5 text-3xl font-semibold tracking-tight">Make room for great work.</h2><p className="mt-4 max-w-md text-sm leading-7 text-muted">{error ? 'Your saved projects will appear when the connection is restored.' : 'Create your first project and bring your brief, client and deadline together.'}</p><Button className="mt-7" onClick={() => navigate('/projects')}><Plus size={17} aria-hidden="true" />Open projects</Button></>}
           </div>
         </section>
