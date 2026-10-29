@@ -54,9 +54,13 @@ export async function api(path, { method = 'GET', body, signal } = {}) {
   return request(path, { method, headers, signal, ...(body !== undefined ? { body: JSON.stringify(body) } : {}) })
 }
 
-export async function uploadFile(path, file) {
-  if (!['/profile/avatar', '/profile/resume'].includes(path)) throw new ApiError('Unsupported upload.')
+export async function uploadFile(path, file, fields = {}) {
+  if (!['/profile/avatar', '/profile/resume'].includes(path) && !/^\/reviews\/[a-f0-9]{24}\/designs$/.test(path)) throw new ApiError('Unsupported upload.')
   const body = new FormData()
+  for (const [key, value] of Object.entries(fields)) {
+    if (!['title', 'version'].includes(key) || typeof value !== 'string') throw new ApiError('Unsupported upload fields.')
+    body.append(key, value)
+  }
   body.append('file', file)
   return request(path, { method: 'POST', headers: { 'X-CSRF-Token': await securityToken() }, body })
 }

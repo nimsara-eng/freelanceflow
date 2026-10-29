@@ -14,6 +14,7 @@ import AuthProvider from './features/auth/AuthProvider'
 import AccountGate from './features/auth/AccountGate'
 import { useAuth } from './features/auth/useAuth'
 
+const DesignReview = lazy(() => import('./pages/DesignReview'))
 const Invitation = lazy(() => import('./pages/Invitation'))
 
 const Projects = lazy(() => import('./pages/Projects'))
@@ -62,6 +63,7 @@ export default function App() {
         <Route path="invoices" element={<Invoices />} />
         </Route>
         <Route path="invitations" element={<Suspense fallback={<p role="status" className="text-sm text-muted">Opening invitation…</p>}><Invitation /></Suspense>} />
+        <Route path="reviews/:projectId" element={<Suspense fallback={<p role="status" className="text-sm text-muted">Opening design review…</p>}><DesignReview /></Suspense>} />
         <Route path="collaborations" element={<ClientProjects />} />
         <Route path="find-freelancer" element={<FindFreelancer />} />
         <Route path="freelancers/:freelancerId" element={<FindFreelancer />} />
