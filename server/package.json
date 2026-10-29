@@ -12,7 +12,8 @@
     "test:projects": "node --test test/projects.test.js",
     "test:invitations": "node --test test/invitations.test.js",
     "test:tasks": "node --test test/tasks.test.js",
-    "test:publishing": "node --test test/profile-publishing.test.js"
+    "test:publishing": "node --test test/profile-publishing.test.js",
+    "test:reviews": "node --test test/reviews.test.js"
   },
   "keywords": [],
   "author": "",

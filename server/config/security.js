@@ -25,7 +25,7 @@ export function newCsrfToken() {
 export function protectWrites(req, _res, next) {
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next()
   const uploadPath = req.originalUrl?.split('?')[0]
-  const fileUpload = req.method === 'POST' && ['/api/profile/avatar', '/api/profile/resume'].includes(uploadPath) && req.is('multipart/form-data')
+  const fileUpload = req.method === 'POST' && (['/api/profile/avatar', '/api/profile/resume'].includes(uploadPath) || /^\/api\/reviews\/[a-f0-9]{24}\/designs$/.test(uploadPath ?? '')) && req.is('multipart/form-data')
   if (!req.is('application/json') && !fileUpload) return next(httpError(415, 'Use application/json, or multipart/form-data on a supported upload endpoint.'))
   const provided = req.get('X-CSRF-Token')
   const expected = req.session?.csrfToken
