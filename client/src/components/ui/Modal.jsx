@@ -2,6 +2,9 @@ import { useEffect, useId, useRef } from 'react'
 import { X } from 'lucide-react'
 import Button from './Button'
 
+let openDialogCount = 0
+let originalOverflow = ''
+
 const sizes = {
   sm: 'max-w-sm',
   md: 'max-w-lg',
@@ -37,7 +40,8 @@ export default function Modal({
       return
     }
 
-    const previousOverflow = document.body.style.overflow
+    if (openDialogCount === 0) originalOverflow = document.body.style.overflow
+    openDialogCount += 1
 
     if (!dialog.open) {
       dialog.showModal()
@@ -46,7 +50,8 @@ export default function Modal({
     document.body.style.overflow = 'hidden'
 
     return () => {
-      document.body.style.overflow = previousOverflow
+      openDialogCount = Math.max(0, openDialogCount - 1)
+      if (openDialogCount === 0) document.body.style.overflow = originalOverflow
 
       if (dialog.open) {
         dialog.close()
