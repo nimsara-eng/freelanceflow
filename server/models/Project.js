@@ -1,4 +1,15 @@
 import mongoose from 'mongoose'
+import { MAX_TASKS, taskStatuses } from '../utils/tasks.js'
+
+const taskSchema = new mongoose.Schema({
+  title: { type: String, trim: true, required: true, minlength: 2, maxlength: 120 },
+  description: { type: String, trim: true, maxlength: 2000, default: '' },
+  dueDate: { type: String, default: '', match: /^(?:|\d{4}-\d{2}-\d{2})$/ },
+  status: { type: String, enum: taskStatuses, default: 'todo', required: true },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+}, { strict: 'throw' })
+
 
 const projectSchema = new mongoose.Schema({
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, immutable: true },
@@ -6,6 +17,7 @@ const projectSchema = new mongoose.Schema({
   client: { type: String, trim: true, required: true, minlength: 2, maxlength: 100 },
   description: { type: String, trim: true, maxlength: 4000, default: '' },
   dueDate: { type: String, required: true, match: /^\d{4}-\d{2}-\d{2}$/ },
+  tasks: { type: [taskSchema], default: () => [], validate: { validator: (tasks) => tasks.length <= MAX_TASKS, message: 'Too many tasks in this project.' } },
   collaborationStatus: { type: String, enum: ['none', 'pending', 'accepted', 'declined'], default: 'none' },
   invitationHash: { type: String, match: /^[a-f0-9]{64}$/, select: false },
   invitationExpiresAt: { type: Date, default: null },

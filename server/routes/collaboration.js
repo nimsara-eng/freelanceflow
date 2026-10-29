@@ -64,20 +64,20 @@ router.get('/projects', async (req, res) => {
   Object.assign(filter, { clientUser: req.user._id, collaborationStatus: 'accepted' })
   const membership = { clientUser: req.user._id, collaborationStatus: 'accepted' }
   const [projects, total, grouped] = await Promise.all([
-    Project.find(filter).sort(sort).skip((page - 1) * limit).limit(limit).populate('owner', 'displayName').lean(),
+    Project.find(filter).select('-tasks.title -tasks.description -tasks.dueDate -tasks.createdAt -tasks.updatedAt').sort(sort).skip((page - 1) * limit).limit(limit).populate('owner', 'displayName').lean(),
     Project.countDocuments(filter),
     Project.aggregate([{ $match: membership }, { $group: { _id: '$status', count: { $sum: 1 } } }]),
   ])
   const statistics = { total: 0, active: 0, review: 0, completed: 0 }
   for (const entry of grouped) { statistics[entry._id] = entry.count; statistics.total += entry.count }
-  res.json({ success: true, projects: projects.map(clientProjectDto), pagination: { page, limit, total, pages: Math.ceil(total / limit) }, statistics })
+  res.json({ success: true, projects: projects.map((project) => clientProjectDto(project)), pagination: { page, limit, total, pages: Math.ceil(total / limit) }, statistics })
 })
 
 router.get('/projects/:id', async (req, res) => {
   if (!mongoose.isObjectIdOrHexString(req.params.id)) throw httpError(404, 'Project not found or access has been removed.')
   const project = await Project.findOne({ _id: req.params.id, clientUser: req.user._id, collaborationStatus: 'accepted' }).populate('owner', 'displayName').lean()
   if (!project) throw httpError(404, 'Project not found or access has been removed.')
-  res.json({ success: true, project: clientProjectDto(project) })
+  res.json({ success: true, project: clientProjectDto(project, true) })
 })
 
 export default router

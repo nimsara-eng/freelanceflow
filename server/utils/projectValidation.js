@@ -1,3 +1,4 @@
+import { projectTasks, taskStatuses } from './tasks.js'
 import { collaborationDto } from './invitations.js'
 import { httpError } from './httpError.js'
 
@@ -20,10 +21,7 @@ export function parseDelete(body) {
 export function parseProject(body, update = false) {
   object(body, ['name', 'client', 'description', 'dueDate', 'status', ...(update ? ['version'] : [])])
   const result = { name: text(body.name, 'Project name', 2, 120), client: text(body.client, 'Client name', 2, 100), description: text(body.description ?? '', 'Description', 0, 4000) }
-  if (typeof body.dueDate !== 'string' || !/^(19|20|21)\d{2}-\d{2}-\d{2}$/.test(body.dueDate)) throw httpError(400, 'Choose a valid deadline between 1900 and 2199.')
-  const date = new Date(`${body.dueDate}T00:00:00.000Z`)
-  if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== body.dueDate) throw httpError(400, 'Choose a real calendar date.')
-  result.dueDate = body.dueDate
+  result.dueDate = parseDate(body.dueDate)
   result.status = body.status ?? 'active'
   if (!statuses.includes(result.status)) throw httpError(400, 'Choose a valid project status.')
   if (update) parseVersion(body)
@@ -47,6 +45,23 @@ export function parseProjectQuery(query, owner) {
   if (status !== 'all') filter.status = status
   return { filter, sort: sort === 'name' ? { name: 1, _id: 1 } : { dueDate: 1, _id: 1 }, page: Number(page), limit: Number(limit) }
 }
-export function projectDto(project) {
-  return { id: String(project._id), name: project.name, client: project.client, description: project.description, dueDate: project.dueDate, status: project.status, version: project.__v, collaboration: collaborationDto(project), createdAt: project.createdAt, updatedAt: project.updatedAt }
+export function projectDto(project, includeTasks = false) {
+  return { ...projectTasks(project, includeTasks), id: String(project._id), name: project.name, client: project.client, description: project.description, dueDate: project.dueDate, status: project.status, version: project.__v, collaboration: collaborationDto(project), createdAt: project.createdAt, updatedAt: project.updatedAt }
+}
+
+function parseDate(value, optional = false) {
+  if (optional && value === '') return ''
+  if (typeof value !== 'string' || !/^(19|20|21)\d{2}-\d{2}-\d{2}$/.test(value)) throw httpError(400, 'Choose a valid deadline between 1900 and 2199.')
+  const date = new Date(value + 'T00:00:00.000Z')
+  if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== value) throw httpError(400, 'Choose a real calendar date.')
+  return value
+}
+export function parseTask(body) {
+  object(body, ['title', 'description', 'dueDate', 'status', 'version'])
+  parseVersion(body)
+  const title = text(body.title, 'Task title', 2, 120)
+  if (/[\r\n]/.test(title)) throw httpError(400, 'Keep the task title on one line.')
+  const status = body.status === undefined ? 'todo' : body.status
+  if (!taskStatuses.includes(status)) throw httpError(400, 'Choose To do, In progress or Done.')
+  return { title, description: text(body.description === undefined ? '' : body.description, 'Task description', 0, 2000), dueDate: parseDate(body.dueDate === undefined ? '' : body.dueDate, true), status }
 }

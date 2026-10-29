@@ -1,3 +1,4 @@
+import { projectTasks } from './tasks.js'
 import { createHash, randomBytes } from 'node:crypto'
 import { record } from './authValidation.js'
 import { httpError } from './httpError.js'
@@ -25,9 +26,9 @@ export function collaborationDto(project) {
     acceptedAt: project.clientAcceptedAt ?? null,
   }
 }
-export function clientProjectDto(project) {
+export function clientProjectDto(project, includeTasks = false) {
   return {
-    id: String(project._id), name: project.name, description: project.description,
+    ...projectTasks(project, includeTasks), id: String(project._id), name: project.name, description: project.description,
     dueDate: project.dueDate, status: project.status,
     freelancerName: project.owner?.displayName ?? 'Freelancer',
     acceptedAt: project.clientAcceptedAt, updatedAt: project.updatedAt,

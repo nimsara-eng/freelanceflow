@@ -10,7 +10,8 @@
     "test:auth": "node --test test/auth-foundation.test.js",
     "test:media": "node --test test/profile-media.test.js",
     "test:projects": "node --test test/projects.test.js",
-    "test:invitations": "node --test test/invitations.test.js"
+    "test:invitations": "node --test test/invitations.test.js",
+    "test:tasks": "node --test test/tasks.test.js"
   },
   "keywords": [],
   "author": "",

@@ -21,7 +21,7 @@ export function addProjectInvitations(router, writes) {
       $inc: { __v: 1 },
     }, { returnDocument: 'after', runValidators: true })
     if (!project) return explainMissing(req)
-    res.status(201).json({ success: true, project: projectDto(project), token: invitation.token })
+    res.status(201).json({ success: true, project: projectDto(project, true), token: invitation.token })
   })
   router.delete('/:id/invitation', writes, async (req, res) => {
     const version = parseDelete(req.body)
@@ -30,6 +30,6 @@ export function addProjectInvitations(router, writes) {
       $unset: { invitationHash: '' }, $inc: { __v: 1 },
     }, { returnDocument: 'after', runValidators: true })
     if (!project) return explainMissing(req)
-    res.json({ success: true, project: projectDto(project) })
+    res.json({ success: true, project: projectDto(project, true) })
   })
 }
