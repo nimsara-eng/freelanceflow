@@ -97,3 +97,9 @@ export function freelancerDto(profile) {
     hasResume: Boolean(profile.resumeAssetId),
   }
 }
+
+export function parseProfileVisibility(body) {
+  record(body, ['visibility'])
+  if (!['private', 'published'].includes(body.visibility)) throw httpError(400, 'Choose private or published profile visibility.')
+  return { visibility: body.visibility }
+}

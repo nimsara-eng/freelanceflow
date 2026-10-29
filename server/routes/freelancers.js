@@ -15,7 +15,7 @@ async function visibleProfile(req) {
   if (!/^FF-[A-F0-9]{12}$/.test(freelancerId)) throw httpError(404, 'Freelancer profile not found.')
   const profile = await FreelancerProfile.findOne({ freelancerId, visibility: 'published' })
   if (!profile) throw httpError(404, 'Freelancer profile not found.')
-  const owner = await User.findOne({ _id: profile.user, emailVerified: true }).select('displayName bio avatarAssetId updatedAt')
+  const owner = await User.findOne({ _id: profile.user, roles: 'freelancer' }).select('displayName bio avatarAssetId updatedAt')
   if (!owner) throw httpError(404, 'Freelancer profile not found.')
   return { profile, owner }
 }
