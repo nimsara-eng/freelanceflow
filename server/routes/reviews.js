@@ -1,3 +1,5 @@
+import {addApprovals} from './approvals.js'
+import {deliveryLocked,currentConnection} from '../utils/approvals.js'
 import { ownedProject, liveProjects } from '../utils/workspace.js'
 import {notify} from '../services/notifications.js'
 import { Router } from 'express'
@@ -18,10 +20,10 @@ const writes = rateLimit({ windowMs: 15 * 60 * 1000, limit: 100, keyGenerator: (
 const receive = multer({ storage: multer.memoryStorage(), limits: { fileSize: maximumFileSize, files: 1, fields: 2, fieldSize: 160, parts: 4 } }).single('file')
 // ponytail: two image conversions per process; use a shared worker queue if deployed across multiple processes.
 let activeUploads = 0
-const metadataFields = 'owner name clientUser clientAcceptedAt collaborationStatus __v designVersions._id designVersions.title designVersions.width designVersions.height designVersions.sharedWith designVersions.createdAt designVersions.comments'
+const metadataFields = 'status tasks.status approvals deliveries clientDisplayName owner name clientUser clientAcceptedAt collaborationStatus __v designVersions._id designVersions.title designVersions.width designVersions.height designVersions.sharedWith designVersions.createdAt designVersions.comments'
 const missing = () => httpError(404, 'Design review not found or access has been removed.')
 const access = (req) => ({ _id: req.params.id, ...liveProjects, $or: [{ owner: req.user._id }, { clientUser: req.user._id, collaborationStatus: 'accepted' }] })
-for (const parameter of ['id', 'designId', 'commentId', 'replyId']) router.param(parameter, (_req, _res, next, value) => {
+for (const parameter of ['id', 'designId', 'commentId', 'replyId', 'approvalId', 'deliveryId']) router.param(parameter, (_req, _res, next, value) => {
   if (!mongoose.isObjectIdOrHexString(value)) throw missing()
   next()
 })
@@ -48,6 +50,8 @@ async function update(req, project, owner, mutation, arrayFilters) {
   if (!result.matchedCount) throw httpError(409, 'The project changed or access was removed. Reload review before trying again.')
 }
 const author = (req, owner) => ({ authorUser: req.user._id, authorName: req.user.displayName, authorRole: owner ? 'freelancer' : 'client', createdAt: new Date() })
+
+addApprovals(router,writes,{context,update,respond,fresh})
 
 router.get('/:id', async (req, res) => respond(req, res))
 router.get('/:id/summary', async (req, res) => {
@@ -85,15 +89,17 @@ router.post('/:id/designs', writes, requireFreelancer, async (req, res) => {
 })
 router.patch('/:id/designs/:designId/sharing', writes, requireFreelancer, async (req, res) => {
   const { shared } = parseReview(req.body, 'share')
-  const { project } = await context(req, true); fresh(req, project)
+  const { project,design } = await context(req, true); fresh(req, project)
+  if(!shared&&deliveryLocked(project,req.params.designId))throw httpError(409,'This version is included in a final delivery and cannot be unshared.')
   if (shared && (project.collaborationStatus !== 'accepted' || !project.clientUser)) throw httpError(409, 'Invite a client and wait for acceptance before sharing a design.')
-  await update(req, project, true, { $set: { 'designVersions.$[design].sharedWith': shared ? project.clientUser : null } }, [{ 'design._id': req.params.designId }])
+  await update(req, project, true, { $set: { 'designVersions.$[design].sharedWith': shared ? project.clientUser : null, ...(!shared?{approvals:(project.approvals??[]).map(item=>String(item.designId)===String(design._id)&&item.status==='pending'?{...item,status:'withdrawn',respondedAt:new Date(),respondedByName:req.user.displayName}:item)}:{}) } }, [{ 'design._id': req.params.designId }])
   if(shared)await notify(project.clientUser,`design:${req.params.designId}:${req.body.version}`,`Design shared: ${project.name}`,`/reviews/${project._id}`)
   await respond(req, res)
 })
 router.delete('/:id/designs/:designId', writes, requireFreelancer, async (req, res) => {
   parseReview(req.body, 'remove')
   const { project } = await context(req, true); fresh(req, project)
+  if(deliveryLocked(project,req.params.designId)||(project.approvals??[]).some(item=>String(item.designId)===req.params.designId&&item.status==='pending'&&currentConnection(item,project)))throw httpError(409,'Withdraw the pending request or delivery before removing this version.')
   await update(req, project, true, { $pull: { designVersions: { _id: req.params.designId } } })
   // The selected version no longer exists; return the remaining review explicitly.
   delete req.params.designId

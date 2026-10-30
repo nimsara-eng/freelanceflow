@@ -1,5 +1,7 @@
 import mongoose from 'mongoose'
 import { designVersionSchema } from './DesignVersion.js'
+import {approvalSchema,deliverySchema} from './Signoff.js'
+import {MAX_APPROVALS,MAX_DELIVERIES} from '../utils/approvals.js'
 import { MAX_DESIGNS } from '../utils/prototypes.js'
 import { MAX_TASKS, taskStatuses } from '../utils/tasks.js'
 
@@ -25,6 +27,8 @@ const workRequestSchema = new mongoose.Schema({
 }, { _id: false, strict: 'throw' })
 
 const projectSchema = new mongoose.Schema({
+  approvals:{type:[approvalSchema],default:()=>[],select:false,validate:items=>items.length<=MAX_APPROVALS},
+  deliveries:{type:[deliverySchema],default:()=>[],select:false,validate:items=>items.length<=MAX_DELIVERIES},
   workRequest: { type: workRequestSchema, default: null, select: false },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, immutable: true },
   name: { type: String, trim: true, required: true, minlength: 2, maxlength: 120 },

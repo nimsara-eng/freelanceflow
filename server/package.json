@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test:approvals": "node test/run-local-mvp.mjs approvals",
     "test:mvp-api": "node test/run-local-mvp.mjs",
     "test:all": "node --test test/*.test.js",
     "test:mvp": "node --test test/local-mvp.test.js",

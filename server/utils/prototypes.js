@@ -1,6 +1,7 @@
 import { record, text } from './authValidation.js'
 import { parseVersion } from './projectValidation.js'
 import { httpError } from './httpError.js'
+import {currentConnection,latestApproval,acceptedDelivery,completionError,deliveryLocked,signoffDto} from './approvals.js'
 
 export const MAX_DESIGNS = 5
 export const MAX_COMMENTS = 20
@@ -46,9 +47,15 @@ export function reviewDto(project, userId) {
   return {
     id: String(project._id), name: project.name, version: project.__v, isOwner: owner,
     canShare: owner && accepted,
+    projectStatus:project.status??'active',
+    canComplete:owner&&project.status!=='completed'&&Boolean(acceptedDelivery(project))&&!completionError(project),
+    approvalHistory:(project.approvals??[]).filter(item=>owner||currentConnection(item,project)).map(item=>signoffDto(item,project)),
+    deliveries:(project.deliveries??[]).filter(item=>owner||currentConnection(item,project)).map(item=>signoffDto(item,project)),
     designs: (project.designVersions ?? []).filter((design) => owner || (shared(design) && String(design.sharedWith) === String(userId))).map((design) => ({
       id: String(design._id), title: design.title, width: design.width, height: design.height,
       createdAt: design.createdAt, shared: shared(design),
+      approval:latestApproval(project,design._id)?signoffDto(latestApproval(project,design._id),project):null,
+      deliveryLocked:deliveryLocked(project,design._id),
       comments: (design.comments ?? []).map((comment) => ({ ...message(comment, project, userId), x: comment.x, y: comment.y, resolved: comment.resolved, replies: comment.replies.map((reply) => message(reply, project, userId)) })),
     })),
   }

@@ -19,7 +19,7 @@ export default function Topbar({ sidebarOpen, onMenuToggle, menuButtonRef }) {
   const { user, workspace, switchWorkspace, signOut } = useAuth()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
-  const title = pathname === '/' ? (workspace === 'freelancer' ? 'Dashboard' : 'Overview') : titles[pathname] ?? 'FreelanceFlow'
+  const title = pathname === '/' ? (workspace === 'freelancer' ? 'Dashboard' : 'Overview') : titles[pathname] ?? (pathname.startsWith('/reviews/') ? 'Design review' : pathname.startsWith('/freelancers/') ? 'Freelancer profile' : 'FreelanceFlow')
 
   async function logout() {
     setBusy(true)

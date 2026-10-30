@@ -1,3 +1,4 @@
+import {completionError} from '../utils/approvals.js'
 import { ownedProject } from '../utils/workspace.js'
 import { addProjectTasks } from './projectTasks.js'
 import { addProjectInvitations } from './projectInvitations.js'
@@ -53,6 +54,11 @@ async function missingOrStale(req) {
 }
 router.patch('/:id', writes, async (req, res) => {
   const fields = parseProject(req.body, true)
+  if(fields.status==='completed'){
+    const current=await Project.findOne({...ownedProject(req.user._id,req.params.id),__v:req.body.version}).select('status collaborationStatus clientUser clientAcceptedAt tasks.status approvals deliveries designVersions._id designVersions.sharedWith').lean()
+    if(!current)return missingOrStale(req)
+    if(current.status!=='completed'){const error=completionError(current);if(error)throw httpError(409,error)}
+  }
   const project = await Project.findOneAndUpdate({ ...ownedProject(req.user._id, req.params.id), __v: req.body.version }, { $set: fields, $inc: { __v: 1 } }, { returnDocument: 'after', runValidators: true })
   if (!project) return missingOrStale(req)
   res.json({ success: true, project: projectDto(project, true) })

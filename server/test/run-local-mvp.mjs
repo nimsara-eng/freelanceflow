@@ -63,7 +63,7 @@ try {
   })
   const check = spawn(
     process.execPath,
-    [fileURLToPath(new URL('./mvp-api.check.mjs', import.meta.url))],
+    [fileURLToPath(new URL(process.argv[2]==='approvals'?'./approvals-api.check.mjs':'./mvp-api.check.mjs', import.meta.url))],
     {
       cwd: empty,
       windowsHide: true,
