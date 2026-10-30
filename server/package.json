@@ -4,18 +4,40 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "public:preview": "node scripts/public-preview.mjs",
+    "public:stop": "powershell -NoProfile -File scripts/Stop-PublicPreview.ps1",
+    "test:public": "node test/run-local-mvp.mjs public",
+    "test:approvals": "node test/run-local-mvp.mjs approvals",
+    "test:mvp-api": "node test/run-local-mvp.mjs",
+    "test:all": "node --test test/*.test.js",
+    "test:mvp": "node --test test/local-mvp.test.js",
+    "test": "node --test test/*.test.js",
     "dev": "node --watch server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test:auth": "node --test test/auth-foundation.test.js",
+    "test:media": "node --test test/profile-media.test.js",
+    "test:projects": "node --test test/projects.test.js",
+    "test:invitations": "node --test test/invitations.test.js",
+    "test:tasks": "node --test test/tasks.test.js",
+    "test:publishing": "node --test test/profile-publishing.test.js",
+    "test:reviews": "node --test test/reviews.test.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "connect-mongo": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^18.0.9",
     "express": "^5.2.1",
-    "mongoose": "^9.11.3"
+    "express-rate-limit": "^8.7.1",
+    "express-session": "^1.19.0",
+    "helmet": "^8.3.0",
+    "mongoose": "^9.11.3",
+    "multer": "2.5.0",
+    "pdf-lib": "1.17.1",
+    "qrcode": "1.5.4",
+    "sharp": "0.35.5"
   }
 }
