@@ -13,6 +13,8 @@ import Asset from './models/Asset.js'
 import Notification from './models/Notification.js'
 import {ScheduleBlock,TimeEntry} from './models/WorkTime.js'
 import workTimeRoutes from './routes/workTime.js'
+import Invoice from './models/Invoice.js'
+import invoiceRoutes from './routes/invoices.js'
 import requestRoutes from './routes/workRequests.js'
 import clientRoutes from './routes/clients.js'
 import notificationRoutes from './routes/notifications.js'
@@ -34,7 +36,7 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invali
 const origins = configuredOrigins()
 
 await connectDB()
-await Promise.all([User.init(), FreelancerProfile.init(), Asset.init(), Project.init(), Notification.init(), ScheduleBlock.init(), TimeEntry.init()])
+await Promise.all([User.init(), FreelancerProfile.init(), Asset.init(), Project.init(), Notification.init(), ScheduleBlock.init(), TimeEntry.init(), Invoice.init()])
 
 const app = express()
 app.disable('x-powered-by')
@@ -65,6 +67,7 @@ app.use('/api/work-requests', requestRoutes)
 app.use('/api/clients', clientRoutes)
 app.use('/api/notifications', notificationRoutes)
 app.use('/api/time', workTimeRoutes)
+app.use('/api/invoices', invoiceRoutes)
 app.use('/api/reviews', reviewRoutes)
 app.use('/api/projects', projectRoutes)
 app.use('/api/collaboration', collaborationRoutes)

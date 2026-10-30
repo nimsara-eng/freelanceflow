@@ -30,6 +30,7 @@ function SidebarContent({ idPrefix, onNavigate, onClose }) {
     { to: '/', label: 'Overview', icon: LayoutDashboard },
     { to: '/collaborations', label: 'My projects', icon: FolderKanban },
     { to: '/requests', label: 'My requests', icon: Inbox },
+    { to: '/invoices', label: 'Invoices', icon: FileText },
     { to: '/find-freelancer', label: 'Find a freelancer', icon: Search },
     { to: '/settings', label: 'Settings', icon: Settings },
   ]
