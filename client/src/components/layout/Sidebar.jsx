@@ -8,11 +8,11 @@ import {
   Settings,
   Users,
   X,
-  Zap,
   Search,
   Inbox,
 } from 'lucide-react'
 import { useAuth } from '../../features/auth/useAuth'
+import freelanceflowMark from '../../assets/freelanceflow-mark.png'
 
 const navigation = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -42,9 +42,7 @@ function SidebarContent({ idPrefix, onNavigate, onClose }) {
   return (
     <>
       <div className="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-6">
-        <span className="flex size-9 items-center justify-center rounded-xl bg-brand shadow-lg shadow-black/30">
-          <Zap size={20} aria-hidden="true" className="text-white" />
-        </span>
+        <img src={freelanceflowMark} alt="" width="1295" height="1214" className="size-9 shrink-0 rounded-lg bg-white object-contain p-0.5" />
 
         <span className="text-lg font-semibold tracking-tight text-white">
           FreelanceFlow

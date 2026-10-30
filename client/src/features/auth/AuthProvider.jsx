@@ -9,12 +9,12 @@ function savedWorkspace(user) {
   try {
     const value = sessionStorage.getItem(`freelanceflow:workspace:${user.id}`)
     if (value === 'client' || (value === 'freelancer' && user.roles.includes('freelancer'))) return value
-  } catch { /* Workspace selection also works without browser storage. */ }
+  } catch { /* Ignore blocked preference storage. */ }
   return user.roles.includes('freelancer') ? 'freelancer' : 'client'
 }
 
 function announceSessionChange() {
-  try { localStorage.setItem(eventKey, crypto.randomUUID()) } catch { /* No credentials are stored here. */ }
+  try { localStorage.setItem(eventKey, crypto.randomUUID()) } catch { /* Cross-tab updates are optional. */ }
 }
 
 export default function AuthProvider({ children }) {
@@ -110,7 +110,7 @@ export default function AuthProvider({ children }) {
   function switchWorkspace(next) {
     if (next !== 'client' && !(next === 'freelancer' && account.user?.roles.includes('freelancer'))) return
     setWorkspace(next)
-    try { sessionStorage.setItem(`freelanceflow:workspace:${account.user.id}`, next) } catch { /* Optional preference. */ }
+    try { sessionStorage.setItem(`freelanceflow:workspace:${account.user.id}`, next) } catch { /* Ignore blocked preference storage. */ }
   }
 
   return (

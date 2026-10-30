@@ -50,7 +50,6 @@ export async function api(path, { method = 'GET', body, signal } = {}) {
     headers['Content-Type'] = 'application/json'
     headers['X-CSRF-Token'] = await securityToken()
   }
-  // Mutations are never automatically replayed after a failed request.
   return request(path, { method, headers, signal, ...(body !== undefined ? { body: JSON.stringify(body) } : {}) })
 }
 

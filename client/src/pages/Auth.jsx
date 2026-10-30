@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { ArrowRight, BriefcaseBusiness, Check, Layers3, ShieldCheck, Users, Zap } from 'lucide-react'
+import { ArrowRight, BriefcaseBusiness, Check, Layers3, ShieldCheck, Users } from 'lucide-react'
 import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import { SessionStatus } from '../features/auth/AccountGate'
 import { safeReturnTo } from '../features/auth/redirect'
 import { useAuth } from '../features/auth/useAuth'
+import freelanceflowMark from '../assets/freelanceflow-mark.png'
 
 export default function Auth({ mode }) {
   const signup = mode === 'register'
@@ -47,7 +48,7 @@ export default function Auth({ mode }) {
       <aside className="relative overflow-hidden bg-sidebar p-7 text-white sm:p-12 lg:flex lg:flex-col lg:justify-between lg:p-14">
         <div aria-hidden="true" className="pointer-events-none absolute -right-36 top-24 size-96 rounded-full border border-white/10 ring-[70px] ring-white/5" />
         <Link to="/login" className="relative inline-flex items-center gap-3 text-lg font-semibold tracking-tight">
-          <span className="flex size-10 items-center justify-center rounded-xl bg-white/15"><Zap size={22} aria-hidden="true" /></span>
+          <img src={freelanceflowMark} alt="" width="1295" height="1214" className="size-10 shrink-0 rounded-xl bg-white object-contain p-0.5" />
           FreelanceFlow
         </Link>
         <div className="relative mt-10 max-w-lg lg:my-20">
