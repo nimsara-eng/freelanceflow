@@ -16,6 +16,7 @@ import { useAuth } from './features/auth/useAuth'
 
 const DesignReview = lazy(() => import('./pages/DesignReview'))
 const Invitation = lazy(() => import('./pages/Invitation'))
+const WorkRequests = lazy(() => import('./pages/WorkRequests'))
 
 const Projects = lazy(() => import('./pages/Projects'))
 const Settings = lazy(() => import('./pages/Settings'))
@@ -65,6 +66,7 @@ export default function App() {
         <Route path="invitations" element={<Suspense fallback={<p role="status" className="text-sm text-muted">Opening invitation…</p>}><Invitation /></Suspense>} />
         <Route path="reviews/:projectId" element={<Suspense fallback={<p role="status" className="text-sm text-muted">Opening design review…</p>}><DesignReview /></Suspense>} />
         <Route path="collaborations" element={<ClientProjects />} />
+        <Route path="requests" element={<Suspense fallback={<p role="status">Opening requests…</p>}><WorkRequests /></Suspense>} />
         <Route path="find-freelancer" element={<FindFreelancer />} />
         <Route path="freelancers/:freelancerId" element={<FindFreelancer />} />
         <Route path="settings" element={<Suspense fallback={<p role="status" className="text-sm text-muted">Opening settings…</p>}><Settings /></Suspense>} />

@@ -1,3 +1,5 @@
+import { ownedProject, liveProjects } from '../utils/workspace.js'
+import {notify} from '../services/notifications.js'
 import { Router } from 'express'
 import mongoose from 'mongoose'
 import multer from 'multer'
@@ -18,13 +20,13 @@ const receive = multer({ storage: multer.memoryStorage(), limits: { fileSize: ma
 let activeUploads = 0
 const metadataFields = 'owner name clientUser clientAcceptedAt collaborationStatus __v designVersions._id designVersions.title designVersions.width designVersions.height designVersions.sharedWith designVersions.createdAt designVersions.comments'
 const missing = () => httpError(404, 'Design review not found or access has been removed.')
-const access = (req) => ({ _id: req.params.id, $or: [{ owner: req.user._id }, { clientUser: req.user._id, collaborationStatus: 'accepted' }] })
+const access = (req) => ({ _id: req.params.id, ...liveProjects, $or: [{ owner: req.user._id }, { clientUser: req.user._id, collaborationStatus: 'accepted' }] })
 for (const parameter of ['id', 'designId', 'commentId', 'replyId']) router.param(parameter, (_req, _res, next, value) => {
   if (!mongoose.isObjectIdOrHexString(value)) throw missing()
   next()
 })
 async function context(req, ownerOnly = false, fields = metadataFields) {
-  const filter = ownerOnly ? { _id: req.params.id, owner: req.user._id } : access(req)
+  const filter = ownerOnly ? ownedProject(req.user._id, req.params.id) : access(req)
   const project = await Project.findOne(filter).select(fields).lean()
   if (!project) throw missing()
   const owner = String(project.owner) === String(req.user._id)
@@ -40,7 +42,7 @@ function fresh(req, project) {
   if (project.__v !== req.body.version) throw httpError(409, 'The project changed. Reload review before trying again; your draft has been kept.')
 }
 async function update(req, project, owner, mutation, arrayFilters) {
-  const filter = { ...(owner ? { _id: project._id, owner: req.user._id } : { _id: project._id, clientUser: req.user._id, collaborationStatus: 'accepted' }), __v: req.body.version }
+  const filter = { ...(owner ? ownedProject(req.user._id, project._id) : { _id: project._id, clientUser: req.user._id, collaborationStatus: 'accepted' }), __v: req.body.version }
   if (req.params.designId) filter.designVersions = { $elemMatch: { _id: req.params.designId, ...(!owner ? { sharedWith: req.user._id } : {}) } }
   const result = await Project.updateOne(filter, { ...mutation, $inc: { __v: 1 } }, { runValidators: true, ...(arrayFilters ? { arrayFilters } : {}) })
   if (!result.matchedCount) throw httpError(409, 'The project changed or access was removed. Reload review before trying again.')
@@ -76,7 +78,7 @@ router.post('/:id/designs', writes, requireFreelancer, async (req, res) => {
     if ((project.designVersions?.length ?? 0) >= MAX_DESIGNS) throw httpError(409, 'This project has five design versions. Remove an old version before uploading another.')
     if (req.aborted || !req.file?.buffer?.length) throw httpError(400, 'Choose one image to upload.')
     const image = await prepareDesign(req.file.buffer)
-    const result = await Project.updateOne({ _id: project._id, owner: req.user._id, __v: req.body.version, [`designVersions.${MAX_DESIGNS - 1}`]: { $exists: false } }, { $push: { designVersions: { _id: new mongoose.Types.ObjectId(), title, ...image, sharedWith: null, comments: [], createdAt: new Date() } }, $inc: { __v: 1 } }, { runValidators: true })
+    const result = await Project.updateOne({ ...ownedProject(req.user._id, project._id), __v: req.body.version, [`designVersions.${MAX_DESIGNS - 1}`]: { $exists: false } }, { $push: { designVersions: { _id: new mongoose.Types.ObjectId(), title, ...image, sharedWith: null, comments: [], createdAt: new Date() } }, $inc: { __v: 1 } }, { runValidators: true })
     if (!result.matchedCount) throw httpError(409, 'The project changed during the upload. Reload review before retrying.')
     await respond(req, res, 201)
   } finally { activeUploads-- }
@@ -86,6 +88,7 @@ router.patch('/:id/designs/:designId/sharing', writes, requireFreelancer, async 
   const { project } = await context(req, true); fresh(req, project)
   if (shared && (project.collaborationStatus !== 'accepted' || !project.clientUser)) throw httpError(409, 'Invite a client and wait for acceptance before sharing a design.')
   await update(req, project, true, { $set: { 'designVersions.$[design].sharedWith': shared ? project.clientUser : null } }, [{ 'design._id': req.params.designId }])
+  if(shared)await notify(project.clientUser,`design:${req.params.designId}:${req.body.version}`,`Design shared: ${project.name}`,`/reviews/${project._id}`)
   await respond(req, res)
 })
 router.delete('/:id/designs/:designId', writes, requireFreelancer, async (req, res) => {
@@ -101,6 +104,7 @@ router.post('/:id/designs/:designId/comments', writes, async (req, res) => {
   const { project, owner, design } = await context(req); fresh(req, project)
   if (design.comments.length >= MAX_COMMENTS) throw httpError(409, 'This version has 20 feedback threads. Upload a new revision to continue.')
   await update(req, project, owner, { $push: { 'designVersions.$[design].comments': { _id: new mongoose.Types.ObjectId(), ...fields, ...author(req, owner), resolved: false, replies: [] } } }, [{ 'design._id': req.params.designId }])
+  if(!owner||String(design.sharedWith)===String(project.clientUser))await notify(owner?project.clientUser:project.owner,`feedback:${project._id}:${req.body.version}`,`New design feedback: ${project.name}`,`/reviews/${project._id}`)
   await respond(req, res, 201)
 })
 router.post('/:id/designs/:designId/comments/:commentId/replies', writes, async (req, res) => {
@@ -112,6 +116,7 @@ router.post('/:id/designs/:designId/comments/:commentId/replies', writes, async 
   if (comment.resolved) throw httpError(409, 'This thread is resolved. Ask the freelancer to reopen it before replying.')
   if (comment.replies.length >= MAX_REPLIES) throw httpError(409, 'This thread has reached its limit of 10 replies.')
   await update(req, project, owner, { $push: { 'designVersions.$[design].comments.$[comment].replies': { _id: new mongoose.Types.ObjectId(), ...fields, ...author(req, owner) } } }, [{ 'design._id': req.params.designId }, { 'comment._id': req.params.commentId }])
+  if(!owner||String(design.sharedWith)===String(project.clientUser))await notify(owner?project.clientUser:project.owner,`reply:${project._id}:${req.body.version}`,`New feedback reply: ${project.name}`,`/reviews/${project._id}`)
   await respond(req, res, 201)
 })
 router.patch('/:id/designs/:designId/comments/:commentId', writes, requireFreelancer, async (req, res) => {

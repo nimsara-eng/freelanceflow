@@ -10,6 +10,10 @@ import { connectDB } from './config/db.js'
 import User from './models/User.js'
 import FreelancerProfile from './models/FreelancerProfile.js'
 import Asset from './models/Asset.js'
+import Notification from './models/Notification.js'
+import requestRoutes from './routes/workRequests.js'
+import clientRoutes from './routes/clients.js'
+import notificationRoutes from './routes/notifications.js'
 import Project from './models/Project.js'
 import reviewRoutes from './routes/reviews.js'
 import collaborationRoutes from './routes/collaboration.js'
@@ -28,7 +32,7 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invali
 const origins = configuredOrigins()
 
 await connectDB()
-await Promise.all([User.init(), FreelancerProfile.init(), Asset.init(), Project.init()])
+await Promise.all([User.init(), FreelancerProfile.init(), Asset.init(), Project.init(), Notification.init()])
 
 const app = express()
 app.disable('x-powered-by')
@@ -55,6 +59,9 @@ app.get('/api/health', (_req, res) => res.json({ success: true, message: 'Freela
 app.use('/api/auth', authRoutes)
 app.use('/api/profile', profileRoutes)
 app.use('/api/freelancers', freelancerRoutes)
+app.use('/api/work-requests', requestRoutes)
+app.use('/api/clients', clientRoutes)
+app.use('/api/notifications', notificationRoutes)
 app.use('/api/reviews', reviewRoutes)
 app.use('/api/projects', projectRoutes)
 app.use('/api/collaboration', collaborationRoutes)

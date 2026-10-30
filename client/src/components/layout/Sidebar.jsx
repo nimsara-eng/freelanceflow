@@ -10,6 +10,7 @@ import {
   X,
   Zap,
   Search,
+  Inbox,
 } from 'lucide-react'
 import { useAuth } from '../../features/auth/useAuth'
 
@@ -17,6 +18,7 @@ const navigation = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/clients', label: 'Clients', icon: Users },
   { to: '/projects', label: 'Projects', icon: FolderKanban },
+  { to: '/requests', label: 'Work requests', icon: Inbox },
   { to: '/time', label: 'Time Tracking', icon: Clock },
   { to: '/invoices', label: 'Invoices', icon: FileText },
   { to: '/settings', label: 'Settings', icon: Settings },
@@ -27,6 +29,7 @@ function SidebarContent({ idPrefix, onNavigate, onClose }) {
   const links = workspace === 'freelancer' ? navigation : [
     { to: '/', label: 'Overview', icon: LayoutDashboard },
     { to: '/collaborations', label: 'My projects', icon: FolderKanban },
+    { to: '/requests', label: 'My requests', icon: Inbox },
     { to: '/find-freelancer', label: 'Find a freelancer', icon: Search },
     { to: '/settings', label: 'Settings', icon: Settings },
   ]

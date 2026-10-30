@@ -1,285 +1,132 @@
-import { useId, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ArrowUpRight, SearchX } from 'lucide-react'
-import Badge from '../components/ui/Badge'
-import Button from '../components/ui/Button'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useProjects } from '../features/projects/useProjects'
 import Card from '../components/ui/Card'
-import EmptyState from '../components/ui/EmptyState'
+import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
-import Modal from '../components/ui/Modal'
-import { sampleProjects } from '../features/dashboard/sampleProjects'
-
-const sampleClients = [...new Set(
-  sampleProjects.map((project) => project.client),
-)]
-  .map((name) => ({
-    name,
-    projects: sampleProjects.filter(
-      (project) => project.client === name,
-    ),
-  }))
-  .sort((first, second) => first.name.localeCompare(second.name))
-
-const projectStatuses = {
-  active: { label: 'In progress', tone: 'brand' },
-  review: { label: 'Awaiting review', tone: 'warning' },
-  completed: { label: 'Completed', tone: 'success' },
-}
-
-function getInitials(name) {
-  return name
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((word) => word.charAt(0))
-    .join('')
-}
-
 export default function Clients() {
-  const navigate = useNavigate()
-  const filterId = useId()
-
-  const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState('all')
-  const [selectedClient, setSelectedClient] = useState(null)
-
-  const searchTerm = search.trim().toLowerCase()
-
-  const visibleClients = sampleClients.filter((client) => {
-    const matchesSearch = client.name
-      .toLowerCase()
-      .includes(searchTerm)
-
-    const matchesFilter =
-      filter === 'all' ||
-      client.projects.some((project) =>
-        filter === 'ongoing'
-          ? project.status !== 'completed'
-          : project.status === 'completed',
-      )
-
-    return matchesSearch && matchesFilter
-  })
-
-  function clearFilters() {
-    setSearch('')
-    setFilter('all')
-  }
-
-  function viewProjects(clientName) {
-    const params = new URLSearchParams({ client: clientName })
-    navigate(`/projects?${params.toString()}`)
-  }
-
+  const [search, setSearch] = useState(''),
+    [q, setQ] = useState(''),
+    [activity, setActivity] = useState('all'),
+    [pageState, setPage] = useState({ key: '', page: 1 })
+  const key = `${q}:${activity}`,
+    page = pageState.key === key ? pageState.page : 1
+  const { data, loading, error, refresh } = useProjects(
+    new URLSearchParams({ q, activity, page: String(page) }).toString(),
+    '/clients',
+  )
   return (
-    <section className="space-y-7">
+    <section className="space-y-6">
       <header>
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-brand">
-          Your network
-        </p>
-
-        <h1 className="text-4xl font-semibold tracking-tight">
-          Clients
-        </h1>
-
-        <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">
-          Keep your client relationships and their project work
-          connected in one place.
+        <p className="text-xs font-semibold uppercase tracking-widest text-brand">Client management</p>
+        <h1 className="mt-3 text-4xl font-semibold">Clients</h1>
+        <p className="mt-3 text-sm leading-7 text-muted">
+          Clients connected to your projects.
         </p>
       </header>
-
-      <div className="flex flex-wrap items-center gap-3">
-        <Badge tone="warning" dot>
-          Sample workspace
-        </Badge>
-
-        <p className="text-xs text-muted">
-          Clients linked to your example projects.
-        </p>
-      </div>
-
       <Card>
-        <div className="grid items-end gap-4 md:grid-cols-[1fr_15rem]">
+        <form
+          onSubmit={(event) => {
+            event.preventDefault()
+            setQ(search.trim())
+          }}
+          className="grid items-end gap-4 sm:grid-cols-[1fr_auto_auto]"
+        >
           <Input
-            type="search"
             label="Search clients"
-            placeholder="Search by client name"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
+            maxLength={100}
           />
-
           <div>
-            <label
-              htmlFor={filterId}
-              className="mb-2 block text-sm font-medium"
-            >
+            <label htmlFor="client-activity" className="mb-2 block text-sm font-medium">
               Project activity
             </label>
-
             <select
-              id={filterId}
-              value={filter}
-              onChange={(event) => setFilter(event.target.value)}
-              className="min-h-11 w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-base text-text sm:text-sm"
+              id="client-activity"
+              value={activity}
+              onChange={(event) => setActivity(event.target.value)}
+              className="min-h-11 rounded-xl border border-border bg-surface px-3"
             >
               <option value="all">All clients</option>
               <option value="ongoing">With ongoing work</option>
-              <option value="completed">With completed projects</option>
+              <option value="completed">With completed work</option>
             </select>
           </div>
-        </div>
-      </Card>
-
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p role="status" className="text-sm text-muted">
-          Showing {visibleClients.length} of {sampleClients.length} clients
-        </p>
-
-        {(search || filter !== 'all') && (
-          <Button variant="ghost" size="sm" onClick={clearFilters}>
-            Reset filters
+          <Button type="submit" variant="secondary">
+            Search
           </Button>
-        )}
-      </div>
-
-      {visibleClients.length === 0 ? (
-        <Card padding="none">
-          <EmptyState
-            icon={<SearchX size={24} />}
-            title="No matching clients"
-            description="Try another name or change the activity filter."
-            action={
-              <Button variant="secondary" onClick={clearFilters}>
-                Clear filters
-              </Button>
-            }
-          />
+        </form>
+      </Card>
+      <Button variant="ghost" onClick={refresh}>
+        Refresh clients
+      </Button>
+      {loading ? (
+        <p role="status">Loading connected clients…</p>
+      ) : error ? (
+        <p role="alert">{error}</p>
+      ) : data.clients.length === 0 ? (
+        <Card>
+          <h2 className="text-lg font-semibold">No clients yet</h2>
+          <p className="mt-3 text-sm leading-7 text-muted">
+            Accept a work request or invite a client to a project.
+          </p>
         </Card>
       ) : (
-        <ul className="grid gap-5 lg:grid-cols-2 2xl:grid-cols-3">
-          {visibleClients.map((client) => {
-            const ongoing = client.projects.filter(
-              (project) => project.status !== 'completed',
-            ).length
-
-            const completed = client.projects.length - ongoing
-
-            return (
-              <li key={client.name} className="min-w-0">
-                <Card className="flex h-full flex-col">
-                  <span
-                    aria-hidden="true"
-                    className="flex size-14 items-center justify-center rounded-2xl bg-brand/10 text-lg font-semibold text-brand"
-                  >
-                    {getInitials(client.name)}
-                  </span>
-
-                  <h2 className="mt-5 wrap-break-word text-xl font-semibold tracking-tight">
-                    {client.name}
-                  </h2>
-
-                  <p className="mt-2 text-sm text-muted">
-                    {client.projects.length}{' '}
-                    {client.projects.length === 1 ? 'linked project' : 'linked projects'}
-                  </p>
-
-                  <dl className="mt-6 grid grid-cols-2 gap-4 border-t border-border pt-5">
-                    <div>
-                      <dt className="text-xs text-muted">
-                        Ongoing
-                      </dt>
-                      <dd className="mt-1 text-2xl font-semibold tabular-nums">
-                        {ongoing}
-                      </dd>
-                    </div>
-
-                    <div>
-                      <dt className="text-xs text-muted">
-                        Completed
-                      </dt>
-                      <dd className="mt-1 text-2xl font-semibold tabular-nums">
-                        {completed}
-                      </dd>
-                    </div>
-                  </dl>
-
-                  <div className="mt-auto flex flex-wrap gap-3 pt-6">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      aria-label={`View ${client.name} details`}
-                      onClick={() => setSelectedClient(client)}
-                    >
-                      View client
-                    </Button>
-
-                    <Button
-                      size="sm"
-                      aria-label={`View projects for ${client.name}`}
-                      onClick={() => viewProjects(client.name)}
-                    >
-                      Projects
-                      <ArrowUpRight size={16} aria-hidden="true" />
-                    </Button>
+        <ul className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {data.clients.map((client) => (
+            <li key={client.id}>
+              <Card>
+                <span
+                  aria-hidden="true"
+                  className="flex size-12 items-center justify-center rounded-2xl bg-brand/10 font-semibold text-brand"
+                >
+                  {client.name.slice(0, 1)}
+                </span>
+                <h2 className="mt-5 wrap-break-word text-xl font-semibold">{client.name}</h2>
+                <p className="mt-2 text-xs text-muted">{client.projects} connected projects</p>
+                <dl className="my-5 grid grid-cols-2 gap-4 border-y border-border py-4">
+                  <div>
+                    <dt className="text-xs text-muted">Ongoing</dt>
+                    <dd className="mt-2 text-2xl font-semibold">{client.ongoing}</dd>
                   </div>
-                </Card>
-              </li>
-            )
-          })}
+                  <div>
+                    <dt className="text-xs text-muted">Completed</dt>
+                    <dd className="mt-2 text-2xl font-semibold">{client.completed}</dd>
+                  </div>
+                </dl>
+                <Link
+                  to={`/projects?clientId=${client.id}`}
+                  className="inline-flex min-h-11 items-center text-sm font-semibold text-brand"
+                >
+                  View client projects →
+                </Link>
+              </Card>
+            </li>
+          ))}
         </ul>
       )}
-
-      <Modal
-        open={Boolean(selectedClient)}
-        onClose={() => setSelectedClient(null)}
-        title={selectedClient?.name ?? 'Client details'}
-        description="Sample client overview"
-        footer={
-          <>
-            <Button
-              variant="secondary"
-              onClick={() => setSelectedClient(null)}
-            >
-              Close
-            </Button>
-
-            {selectedClient && (
-              <Button onClick={() => viewProjects(selectedClient.name)}>
-                View projects
-                <ArrowUpRight size={16} aria-hidden="true" />
-              </Button>
-            )}
-          </>
-        }
-      >
-        {selectedClient && (
-          <div>
-            <h3 className="text-sm font-semibold">
-              Linked projects
-            </h3>
-
-            <ul className="mt-4 divide-y divide-border">
-              {selectedClient.projects.map((project) => {
-                const details = projectStatuses[project.status]
-
-                return (
-                  <li
-                    key={project.id}
-                    className="flex flex-wrap items-center justify-between gap-3 py-4"
-                  >
-                    <span className="text-sm font-medium">
-                      {project.name}
-                    </span>
-
-                    <Badge tone={details.tone} dot>
-                      {details.label}
-                    </Badge>
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
-        )}
-      </Modal>
+      {data && data.pagination.pages > 1 && (
+        <nav aria-label="Client pages" className="flex items-center justify-center gap-4">
+          <Button
+            variant="secondary"
+            disabled={page === 1}
+            onClick={() => setPage({ key, page: page - 1 })}
+          >
+            Previous
+          </Button>
+          <span>
+            {page} / {data.pagination.pages}
+          </span>
+          <Button
+            variant="secondary"
+            disabled={page >= data.pagination.pages}
+            onClick={() => setPage({ key, page: page + 1 })}
+          >
+            Next
+          </Button>
+        </nav>
+      )}
     </section>
   )
 }

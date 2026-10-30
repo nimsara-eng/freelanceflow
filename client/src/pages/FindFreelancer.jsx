@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ExternalLink, Search } from 'lucide-react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import WorkRequestForm from '../features/requests/WorkRequestForm'
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
@@ -14,6 +15,8 @@ export default function FindFreelancer() {
   const { key: lookup } = useLocation()
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
+  const [requesting, setRequesting] = useState(false)
+  const [sent, setSent] = useState(false)
 
   useEffect(() => {
     if (!freelancerId) return
@@ -47,7 +50,7 @@ export default function FindFreelancer() {
   const profile = current?.profile
   return (
     <section className="mx-auto max-w-3xl space-y-6">
-      <header><p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">Make a connection</p><h1 className="mt-3 text-3xl font-semibold tracking-tight">Find a freelancer</h1><p className="mt-3 text-sm leading-7 text-muted">Only published profiles are visible. Knowing an ID does not grant access to someone’s projects.</p></header>
+      <header><p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">Freelancer directory</p><h1 className="mt-3 text-3xl font-semibold tracking-tight">Find a freelancer</h1><p className="mt-3 text-sm leading-7 text-muted">Search by freelancer ID or profile link.</p></header>
       <Card>
         <form onSubmit={search} className="space-y-4">
           <Input key={freelancerId || 'search'} name="freelancerId" label="Freelancer ID or profile link" defaultValue={freelancerId || ''} placeholder="FF-123456ABCDEF" maxLength={2048} required error={error} />
@@ -55,11 +58,13 @@ export default function FindFreelancer() {
         </form>
       </Card>
       {freelancerId && !current && <p role="status" className="text-sm text-muted">Looking for this freelancer…</p>}
-      {current?.error && <Card><p role="alert" className="text-sm">{current.error}</p><p className="mt-3 text-xs leading-6 text-muted">The profile may be private, unpublished or unavailable. Ask the freelancer to publish it from Settings → Freelancer profile and share their exact ID.</p></Card>}
+      {current?.error && <Card><p role="alert" className="text-sm">{current.error}</p><p className="mt-3 text-xs leading-6 text-muted">Check the ID or ask the freelancer to publish their profile.</p></Card>}
       {profile && (
         <Card>
           <div className="mb-5"><Avatar src={profile.avatarUrl} name={profile.displayName} className="size-20 text-xl" /></div>
           <Badge tone="brand">{profile.freelancerId}</Badge>
+          {!profile.isSelf && <div className="mt-5"><Button onClick={() => setRequesting(true)}>Send work request</Button></div>}
+          {sent && <p role="status" className="mt-4 text-sm text-success">Request sent. <Link to="/requests" className="underline">View my requests</Link></p>}
           <h2 className="mt-4 text-2xl font-semibold">{profile.displayName}</h2>
           <p className="mt-2 text-sm text-brand">{profile.headline}</p>
           <p className="mt-2 text-xs text-muted">{[profile.publicLocation?.city, profile.publicLocation?.country].filter(Boolean).join(', ')}</p>
@@ -70,6 +75,7 @@ export default function FindFreelancer() {
           {profile.hasResume && profile.resumeUrl === `/api/freelancers/${profile.freelancerId}/resume` && <a href={profile.resumeUrl} download="resume.pdf" className="mt-6 inline-flex min-h-11 items-center rounded-full border border-border px-5 text-sm font-semibold text-brand hover:bg-surface-2">Download resume (PDF)</a>}
         </Card>
       )}
+      {requesting && profile && <WorkRequestForm profile={profile} onClose={() => setRequesting(false)} onSent={() => { setRequesting(false); setSent(true) }} />}
     </section>
   )
 }

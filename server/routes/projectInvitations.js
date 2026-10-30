@@ -1,10 +1,11 @@
+import { ownedProject } from '../utils/workspace.js'
 import Project from '../models/Project.js'
 import { parseDelete, projectDto } from '../utils/projectValidation.js'
 import { newInvitation } from '../utils/invitations.js'
 import { httpError } from '../utils/httpError.js'
 
 async function explainMissing(req) {
-  const exists = await Project.exists({ _id: req.params.id, owner: req.user._id })
+  const exists = await Project.exists({ ...ownedProject(req.user._id, req.params.id) })
   throw httpError(exists ? 409 : 404, exists ? 'Project or client access changed. Close the dialog and refresh before trying again.' : 'Project not found.')
 }
 export function addProjectInvitations(router, writes) {
@@ -12,7 +13,7 @@ export function addProjectInvitations(router, writes) {
     const version = parseDelete(req.body)
     const invitation = newInvitation()
     const project = await Project.findOneAndUpdate({
-      _id: req.params.id, owner: req.user._id, __v: version,
+      ...ownedProject(req.user._id, req.params.id), __v: version,
       collaborationStatus: { $ne: 'accepted' },
     }, {
       $set: { collaborationStatus: 'pending', invitationHash: invitation.hash,
@@ -25,7 +26,7 @@ export function addProjectInvitations(router, writes) {
   })
   router.delete('/:id/invitation', writes, async (req, res) => {
     const version = parseDelete(req.body)
-    const project = await Project.findOneAndUpdate({ _id: req.params.id, owner: req.user._id, __v: version }, {
+    const project = await Project.findOneAndUpdate({ ...ownedProject(req.user._id, req.params.id), __v: version }, {
       $set: { collaborationStatus: 'none', invitationExpiresAt: null, clientUser: null, clientDisplayName: '', clientAcceptedAt: null },
       $unset: { invitationHash: '' }, $inc: { __v: 1 },
     }, { returnDocument: 'after', runValidators: true })

@@ -13,7 +13,19 @@ const taskSchema = new mongoose.Schema({
 }, { strict: 'throw' })
 
 
+const workRequestSchema = new mongoose.Schema({
+  status: { type: String, enum: ['pending','accepted','declined','withdrawn'], required: true },
+  client: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  clientName: { type: String, required: true, maxlength: 80 },
+  freelancerName: { type: String, required: true, maxlength: 80 },
+  currency: { type: String, enum: ['USD','LKR'], default: 'USD' },
+  budgetCents: { type: Number, min: 0, max: 100000000, required: true, validate: Number.isSafeInteger },
+  createdAt: { type: Date, default: Date.now },
+  respondedAt: { type: Date, default: null },
+}, { _id: false, strict: 'throw' })
+
 const projectSchema = new mongoose.Schema({
+  workRequest: { type: workRequestSchema, default: null, select: false },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, immutable: true },
   name: { type: String, trim: true, required: true, minlength: 2, maxlength: 120 },
   client: { type: String, trim: true, required: true, minlength: 2, maxlength: 100 },
@@ -32,6 +44,8 @@ const projectSchema = new mongoose.Schema({
   status: { type: String, enum: ['active', 'review', 'completed'], default: 'active', required: true },
 }, { timestamps: true, strict: 'throw', optimisticConcurrency: true })
 
+projectSchema.index({ owner: 1, 'workRequest.client': 1 }, { unique: true, partialFilterExpression: { 'workRequest.status': 'pending' } })
+projectSchema.index({ 'workRequest.client': 1, 'workRequest.createdAt': -1 })
 projectSchema.index({ owner: 1, dueDate: 1, _id: 1 })
 projectSchema.index({ owner: 1, status: 1 })
 

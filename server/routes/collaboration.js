@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import {notify} from '../services/notifications.js'
 import mongoose from 'mongoose'
 import { rateLimit } from 'express-rate-limit'
 import Project from '../models/Project.js'
@@ -53,6 +54,7 @@ router.post('/invitations/respond', async (req, res) => {
     $inc: { __v: 1 },
   }, { returnDocument: 'after', runValidators: true })
   if (!updated) throw httpError(409, 'This invitation changed while you were responding. Ask for a current link.')
+  await notify(updated.owner,`invitation:${updated._id}:${updated.__v}`,`Invitation ${accepted?'accepted':'declined'}: ${updated.name}`,`/projects?project=${updated._id}`)
   res.json({ success: true, accepted, ...(accepted ? { projectId: String(updated._id) } : {}) })
 })
 

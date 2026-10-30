@@ -24,7 +24,7 @@ router.get('/:freelancerId', async (req, res) => {
   const { profile, owner } = await visibleProfile(req)
   const sharedResume = profile.showResumeOnProfile && Boolean(profile.resumeAssetId)
   res.json({ success: true, profile: {
-    ...freelancerDto(profile), displayName: owner.displayName, bio: owner.bio,
+    ...freelancerDto(profile), isSelf: String(owner._id) === String(req.user._id), displayName: owner.displayName, bio: owner.bio,
     hasResume: sharedResume,
     resumeUrl: sharedResume ? `/api/freelancers/${profile.freelancerId}/resume` : null,
     avatarUrl: owner.avatarAssetId ? `/api/freelancers/${profile.freelancerId}/avatar?v=${new Date(owner.updatedAt).getTime()}` : null,
