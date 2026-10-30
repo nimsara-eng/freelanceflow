@@ -51,7 +51,7 @@ export function workDto(item) {
     version: item.__v,
   }
 }
-// ponytail: local MVP runs one API process; use a distributed lock or transactions before scaling workers.
+// This lock coordinates time-entry writes within a single API process.
 const queues = new Map()
 export async function withTimeLock(owner, action) {
   const key = String(owner),

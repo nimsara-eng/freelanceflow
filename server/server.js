@@ -28,12 +28,15 @@ import freelancerRoutes from './routes/freelancers.js'
 import { notFound, errorHandler } from './middleware/errorHandler.js'
 import { configuredOrigins, production, protectWrites, sessionCookie, sessionLifetime, sessionName } from './config/security.js'
 import { httpError } from './utils/httpError.js'
+import { fileURLToPath } from 'node:url'
+import { addWebClient } from './services/webClient.js'
 
 const secret = process.env.SESSION_SECRET
 if (!secret || secret.length < 64) throw new Error('Configure a random SESSION_SECRET of at least 64 characters in server/.env.')
 const port = Number(process.env.PORT || 5000)
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid server PORT.')
 const origins = configuredOrigins()
+if (process.env.SERVE_CLIENT === 'true' && !production) throw new Error('The public client must use production mode.')
 
 await connectDB()
 await Promise.all([User.init(), FreelancerProfile.init(), Asset.init(), Project.init(), Notification.init(), ScheduleBlock.init(), TimeEntry.init(), Invoice.init()])
@@ -41,7 +44,20 @@ await Promise.all([User.init(), FreelancerProfile.init(), Asset.init(), Project.
 const app = express()
 app.disable('x-powered-by')
 if (production) app.set('trust proxy', 'loopback')
-app.use(helmet())
+if (process.env.SERVE_CLIENT === 'true') {
+  const publicHost = new URL(process.env.CLIENT_URL).host
+  app.use((req, res, next) => {
+    if (![publicHost, `127.0.0.1:${port}`].includes(req.get('Host'))) return res.sendStatus(421)
+    next()
+  })
+}
+app.use(helmet({ contentSecurityPolicy: { directives: {
+  'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+  'font-src': ["'self'", 'https://fonts.gstatic.com'],
+  'img-src': ["'self'", 'data:', 'blob:'],
+  'connect-src': ["'self'"],
+  'frame-src': ["'none'"],
+} } }))
 app.use(cors({
   credentials: true,
   origin(origin, callback) {
@@ -71,6 +87,8 @@ app.use('/api/invoices', invoiceRoutes)
 app.use('/api/reviews', reviewRoutes)
 app.use('/api/projects', projectRoutes)
 app.use('/api/collaboration', collaborationRoutes)
+app.use('/api', notFound)
+if (process.env.SERVE_CLIENT === 'true') addWebClient(app, fileURLToPath(new URL('../client/dist', import.meta.url)))
 app.use(notFound)
 app.use(errorHandler)
 

@@ -35,8 +35,7 @@ const projectSchema = new mongoose.Schema({
   client: { type: String, trim: true, required: true, minlength: 2, maxlength: 100 },
   description: { type: String, trim: true, maxlength: 4000, default: '' },
   dueDate: { type: String, required: true, match: /^\d{4}-\d{2}-\d{2}$/ },
-  // ponytail: five 2 MB images plus bounded feedback stay below MongoDB's 16 MB document ceiling.
-  // Use object storage and a version collection when larger projects need more retained designs.
+  // Limit images and feedback to fit within MongoDB's 16 MB document limit.
   designVersions: { type: [designVersionSchema], select: false, default: () => [], validate: (items) => items.length <= MAX_DESIGNS },
   tasks: { type: [taskSchema], default: () => [], validate: { validator: (tasks) => tasks.length <= MAX_TASKS, message: 'Too many tasks in this project.' } },
   collaborationStatus: { type: String, enum: ['none', 'pending', 'accepted', 'declined'], default: 'none' },

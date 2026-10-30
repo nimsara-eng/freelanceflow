@@ -18,7 +18,7 @@ const router = Router()
 router.use(requireAuth)
 const writes = rateLimit({ windowMs: 15 * 60 * 1000, limit: 100, keyGenerator: (req) => String(req.user._id), standardHeaders: 'draft-8', legacyHeaders: false, message: { success: false, message: 'Too many review changes. Please wait and try again.' } })
 const receive = multer({ storage: multer.memoryStorage(), limits: { fileSize: maximumFileSize, files: 1, fields: 2, fieldSize: 160, parts: 4 } }).single('file')
-// ponytail: two image conversions per process; use a shared worker queue if deployed across multiple processes.
+// Bound memory usage during concurrent image conversions.
 let activeUploads = 0
 const metadataFields = 'status tasks.status approvals deliveries clientDisplayName owner name clientUser clientAcceptedAt collaborationStatus __v designVersions._id designVersions.title designVersions.width designVersions.height designVersions.sharedWith designVersions.createdAt designVersions.comments'
 const missing = () => httpError(404, 'Design review not found or access has been removed.')

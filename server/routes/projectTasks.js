@@ -21,7 +21,6 @@ export function addProjectTasks(router, writes) {
   router.post('/:id/tasks', writes, async (req, res) => {
     const fields = parseTask(req.body)
     const task = { _id: new mongoose.Types.ObjectId(), ...fields, createdAt: new Date(), updatedAt: new Date() }
-    // ponytail: bounded embedded tasks keep deletion/progress atomic; use a task collection beyond 200 per project.
     const project = await Project.findOneAndUpdate({
       ...ownedProject(req.user._id, req.params.id), __v: req.body.version,
       [`tasks.${MAX_TASKS - 1}`]: { $exists: false },
