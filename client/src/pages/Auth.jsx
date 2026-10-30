@@ -51,23 +51,23 @@ export default function Auth({ mode }) {
           FreelanceFlow
         </Link>
         <div className="relative mt-10 max-w-lg lg:my-20">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-violet-200">Room to do your best work</p>
-          <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">Great work starts<br />with a clear connection.</h1>
-          <p className="mt-5 max-w-sm text-sm leading-7 text-violet-100/80">A shared space for freelancers and the people who trust them with their next idea.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-violet-200">Freelance management</p>
+          <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">Manage projects.<br />Collaborate with clients.</h1>
+          <p className="mt-5 max-w-sm text-sm leading-7 text-violet-100/80">Manage projects, client reviews, time tracking and invoices in one workspace.</p>
           <div className="mt-9 hidden space-y-5 sm:block">
-            {[[Users, 'One account, the right workspace'], [Layers3, 'Projects with room for collaboration'], [ShieldCheck, 'Your work stays in your control']].map(([Icon, text]) => (
+            {[[Users, 'Freelancer and client workspaces'], [Layers3, 'Project updates and design reviews'], [ShieldCheck, 'Time tracking and invoicing']].map(([Icon, text]) => (
               <div key={text} className="flex items-center gap-3 text-sm text-violet-100"><Icon size={19} aria-hidden="true" />{text}</div>
             ))}
           </div>
         </div>
-        <p className="relative hidden text-xs text-violet-200/70 lg:block">Built around the way independent people work.</p>
+        <p className="relative hidden text-xs text-violet-200/70 lg:block">Freelance project management.</p>
       </aside>
 
       <section className="flex items-center justify-center px-5 py-10 sm:px-10 lg:py-14" aria-labelledby="auth-heading">
         <div className="w-full max-w-md">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">{signup ? 'Your next chapter' : 'Your workspace awaits'}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">{signup ? 'Account registration' : 'Account access'}</p>
           <h2 id="auth-heading" className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{signup ? 'Create your account' : 'Welcome back.'}</h2>
-          <p className="mt-3 text-sm leading-relaxed text-muted">{signup ? 'Choose how you want to get started.' : 'Sign in to pick up where you left off.'}</p>
+          <p className="mt-3 text-sm leading-relaxed text-muted">{signup ? 'Select an account type.' : 'Sign in to your account.'}</p>
 
           <form onSubmit={submit} className="mt-8 space-y-5">
             {notice && <p role="status" className="rounded-xl border border-brand/20 bg-brand/5 p-3 text-sm text-text">{notice}</p>}
@@ -93,7 +93,7 @@ export default function Auth({ mode }) {
               )}
               {signup && <Input name="displayName" label="Full name" autoComplete="name" minLength={2} maxLength={80} required />}
               <Input name="email" label="Email address" type="email" autoComplete="email" maxLength={254} required />
-              <Input name="password" label="Password" type="password" autoComplete={signup ? 'new-password' : 'current-password'} minLength={signup ? 15 : undefined} maxLength={128} hint={signup ? 'Use 15–128 characters. A memorable passphrase works well.' : undefined} required />
+              <Input name="password" label="Password" type="password" autoComplete={signup ? 'new-password' : 'current-password'} minLength={signup ? 15 : undefined} maxLength={128} hint={signup ? 'Use 15–128 characters.' : undefined} required />
               {signup && <Input name="confirmation" label="Confirm password" type="password" autoComplete="new-password" minLength={15} maxLength={128} required />}
             </fieldset>
             {(error || sessionError) && <p role="alert" className="rounded-xl border border-danger/20 bg-danger/5 p-3 text-sm text-text">{error || sessionError}</p>}
@@ -106,7 +106,7 @@ export default function Auth({ mode }) {
             {signup ? 'Already have an account? ' : 'New to FreelanceFlow? '}
             <Link to={`${signup ? '/login' : '/signup'}?next=${encodeURIComponent(next)}`} className="font-semibold text-brand hover:underline">{signup ? 'Sign in' : 'Create an account'}</Link>
           </p>
-          {!signup && <p className="mt-5 text-center text-xs leading-5 text-muted">Email password recovery will be available after email delivery is configured.</p>}
+          {!signup && <p className="mt-5 text-center text-xs leading-5 text-muted">Password recovery is currently unavailable.</p>}
         </div>
       </section>
     </main>

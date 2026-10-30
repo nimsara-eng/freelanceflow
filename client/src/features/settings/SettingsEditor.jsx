@@ -45,7 +45,7 @@ export default function SettingsEditor({ initial }) {
 
   return (
     <section className="space-y-7">
-      <header className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">Make it yours</p><h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Settings</h1><p className="mt-3 text-sm leading-7 text-muted">Your profile, your presence, your preferences.</p></div>{dirty && <Badge tone="warning">Unsaved changes</Badge>}</header>
+      <header className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">Account settings</p><h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Settings</h1><p className="mt-3 text-sm leading-7 text-muted">Manage your profile, security and preferences.</p></div>{dirty && <Badge tone="warning">Unsaved changes</Badge>}</header>
       <div className="grid items-start gap-6 xl:grid-cols-[17rem_minmax(0,1fr)]">
         <div className="min-w-0 space-y-4 xl:sticky xl:top-24 xl:space-y-5">
           <div className="flex items-center gap-4 rounded-3xl bg-sidebar p-4 text-white xl:block xl:p-6">
@@ -70,7 +70,7 @@ export default function SettingsEditor({ initial }) {
           <div hidden={section !== 'preferences'}><PreferencesForm report={(status) => report('preferences', status)} /></div>
         </div>
       </div>
-      <Modal open={blocker.state === 'blocked'} onClose={() => blocker.reset?.()} title={busy ? 'Your changes are being saved' : 'Leave without saving?'} description={busy ? 'Please wait until the current request finishes.' : 'Unsaved profile, password or preference changes will be lost.'} size="sm" closeOnBackdrop={!busy} footer={<><Button variant="secondary" onClick={() => blocker.reset?.()}>Keep editing</Button><Button variant="danger" disabled={busy} onClick={() => blocker.proceed?.()}>Leave without saving</Button></>}><p className="text-sm leading-7 text-muted">{busy ? 'You can close this message and stay on Settings while the save completes.' : 'Stay here to save your changes, or leave and discard this draft.'}</p></Modal>
+      <Modal open={blocker.state === 'blocked'} onClose={() => blocker.reset?.()} title={busy ? 'Your changes are being saved' : 'Leave without saving?'} description={busy ? 'Please wait until the current request finishes.' : 'Unsaved profile, password or preference changes will be lost.'} size="sm" closeOnBackdrop={!busy} footer={<><Button variant="secondary" onClick={() => blocker.reset?.()}>Keep editing</Button><Button variant="danger" disabled={busy} onClick={() => blocker.proceed?.()}>Leave without saving</Button></>}><p className="text-sm leading-7 text-muted">{busy ? 'Saving changes. Please wait.' : 'Unsaved changes will be discarded.'}</p></Modal>
     </section>
   )
 }

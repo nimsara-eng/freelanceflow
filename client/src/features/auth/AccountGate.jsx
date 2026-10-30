@@ -5,8 +5,8 @@ import { useAuth } from './useAuth'
 export function SessionStatus() {
   const { status, error, refresh } = useAuth()
   const [title, description] = status === 'error'
-    ? ['We could not open your workspace', error]
-    : ['Opening your workspace', 'Checking your account session…']
+    ? ['Unable to open workspace', error]
+    : ['Opening your workspace', 'Loading account…']
   return (
     <main className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-md rounded-3xl border border-border bg-surface p-8 text-center">

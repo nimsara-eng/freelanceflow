@@ -20,7 +20,7 @@ export default function Settings() {
   if (!current || current.error) return (
     <Card>
       <h1 className="text-2xl font-semibold">{current?.error ? 'Settings could not be loaded' : 'Opening your settings'}</h1>
-      <p role={current?.error ? 'alert' : 'status'} className="mt-3 text-sm leading-7 text-muted">{current?.error || 'Getting your saved profile details…'}</p>
+      <p role={current?.error ? 'alert' : 'status'} className="mt-3 text-sm leading-7 text-muted">{current?.error || 'Loading profile…'}</p>
       {current?.error && <Button className="mt-5" onClick={() => setAttempt((value) => value + 1)}>Try again</Button>}
     </Card>
   )

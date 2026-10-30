@@ -102,7 +102,7 @@ export default function MediaPanel({ report }) {
       {!assets && <Card><p role={loadError ? 'alert' : 'status'} className="text-sm text-muted">{loadError || 'Loading your saved files…'}</p>{loadError && <Button className="mt-4" onClick={() => { setLoadError(''); setAttempt((value) => value + 1) }}>Try again</Button>}</Card>}
       <Card>
         <div className="flex items-center gap-3"><ImagePlus size={22} className="text-brand" aria-hidden="true" /><h2 className="text-xl font-semibold tracking-tight">Profile photo</h2></div>
-        <p className="mt-2 text-sm leading-7 text-muted">Choose a clear photo. We crop it to a square and remove image metadata.</p>
+
         <div className="mt-6 flex flex-wrap items-center gap-5">
           {preview ? <img src={preview} alt="Selected photo preview" className="size-24 rounded-full border border-border object-cover" /> : <Avatar src={user.avatarUrl} name={user.displayName} className="size-24 text-2xl" />}
           <div className="text-xs leading-6 text-muted"><p>JPEG, PNG or WebP · up to 5 MB</p><p>Still images · up to 16 megapixels</p>{files.avatar && <Badge tone="warning">Preview — not saved</Badge>}{assets?.avatar && !files.avatar && <p>Saved photo · {sizeLabel(assets.avatar.size)}</p>}</div>
@@ -114,7 +114,7 @@ export default function MediaPanel({ report }) {
       </Card>
       {freelancerProfile && <Card>
         <div className="flex items-center gap-3"><FileText size={22} className="text-brand" aria-hidden="true" /><h2 className="text-xl font-semibold tracking-tight">Resume</h2><Badge tone={freelancerProfile.showResumeOnProfile ? 'brand' : 'neutral'}>{freelancerProfile.showResumeOnProfile ? 'Sharing enabled' : 'Private'}</Badge></div>
-        <p className="mt-2 text-sm leading-7 text-muted">Upload a PDF of up to 5 MB and 20 pages. Interactive fields, hyperlinks and annotations are removed from the stored copy.</p>
+        <p className="mt-2 text-sm leading-7 text-muted">PDF · Max 5 MB · Max 20 pages.</p>
         {assets?.resume && <div className="mt-5 rounded-2xl border border-border bg-surface-2 p-4"><p className="text-sm font-medium">Your saved resume · {sizeLabel(assets.resume.size)}</p><a href="/api/profile/resume" download="resume.pdf" className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-brand hover:underline">Download saved resume</a></div>}
         <label htmlFor="profile-resume-file" className="mb-2 mt-6 block text-sm font-medium">Choose PDF resume</label>
         <input id="profile-resume-file" ref={resumeInput} type="file" accept="application/pdf,.pdf" disabled={!!busy || !assets} className={fileInputClass} onChange={(event) => choose('resume', event)} />

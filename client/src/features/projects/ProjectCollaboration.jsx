@@ -26,7 +26,7 @@ export default function ProjectCollaboration({ project, onChanged, onBusy, disab
       setLink(result.token ? `${window.location.origin}/invitations#${result.token}` : '')
       setConfirm('')
       onChanged(result.project)
-      setNotice(action === 'create' ? 'Invitation ready. Copy the link and share it privately.' : accepted ? 'Client access removed.' : 'Invitation cancelled.')
+      setNotice(action === 'create' ? 'Invitation link created.' : accepted ? 'Client access removed.' : 'Invitation cancelled.')
     } catch (failure) { setError(failure.message) }
     finally { locked.current = false; setBusy(false); onBusy(false) }
   }
@@ -42,8 +42,8 @@ export default function ProjectCollaboration({ project, onChanged, onBusy, disab
           <p className="mt-2 text-sm leading-6 text-muted">{accepted
             ? `${access.clientName} can view this project’s brief, tasks, progress, deadline and status from their Client workspace.`
             : access.status === 'pending' ? 'Waiting for a client to accept. You can replace the link or cancel the invitation.'
-              : access.status === 'expired' ? 'The last invitation expired. Create a fresh link for your client.'
-                : access.status === 'declined' ? 'The invitation was declined. You can create a new one when you are ready.'
+              : access.status === 'expired' ? 'Invitation expired. Create a new link.'
+                : access.status === 'declined' ? 'Invitation declined. Create a new invitation to resend.'
                   : 'Create a private link. Your client signs in and accepts before they can open the project.'}</p>
         </div>
       </div>
@@ -53,8 +53,8 @@ export default function ProjectCollaboration({ project, onChanged, onBusy, disab
       {link && <div className="space-y-3">
         <Input label="Private invitation link" readOnly value={link} onFocus={(event) => event.target.select()} />
         <Button variant="secondary" size="sm" onClick={copy}><Copy size={16} aria-hidden="true" />Copy invitation link</Button>
-        <p className="text-xs leading-6 text-muted">Anyone with this link can accept it once. Share it only with your intended client. Copy it before closing; creating a replacement invalidates the old link.</p>
-        {['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname) && <p className="text-xs leading-6 text-muted">This local address opens only on this computer. Remote sharing will work after deployment.</p>}
+        <p className="text-xs leading-6 text-muted">Single-use invitation. Share with the intended client. Creating a replacement invalidates this link.</p>
+        {['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname) && <p className="text-xs leading-6 text-muted">Local invitation link. Available on this device.</p>}
       </div>}
       {confirm ? <div className="space-y-3 rounded-xl bg-surface-2 p-4">
         <p className="text-sm leading-6">{confirm === 'replace' ? 'Replace this invitation? The previous link will stop working.' : accepted ? 'Remove this client’s access? They will no longer be able to load the project.' : 'Cancel this invitation? Its link will stop working.'}</p>

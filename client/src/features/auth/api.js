@@ -24,7 +24,7 @@ async function request(path, options = {}) {
     })
   } catch (error) {
     if (error.name === 'AbortError') throw error
-    throw new ApiError('Cannot reach FreelanceFlow. Check that the backend is running and try again.')
+    throw new ApiError('Unable to connect to FreelanceFlow. Please try again.')
   }
   const data = await response.json().catch(() => null)
   if (!response.ok) {
@@ -33,7 +33,7 @@ async function request(path, options = {}) {
     }
     throw new ApiError(data?.message || (response.status === 429 ? 'Too many attempts. Please wait and try again.' : 'The request could not be completed.'), response.status)
   }
-  if (!data || data.success !== true) throw new ApiError('Unexpected server response. Please try again.')
+  if (!data || data.success !== true) throw new ApiError('Unable to complete the request. Please try again.')
   if (typeof data.csrfToken === 'string') csrfToken = data.csrfToken
   return data
 }

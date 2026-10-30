@@ -31,7 +31,7 @@ export default function SecurityForm({ report }) {
         <form noValidate onSubmit={save} className="mt-7 space-y-6">
           <fieldset disabled={form.busy} className="space-y-5 disabled:opacity-70">
             <Input label="Current password" autoComplete="current-password" {...field('currentPassword')} />
-            <Input label="New password" autoComplete="new-password" hint="Use a different password of 15–128 characters. Spaces are preserved." {...field('newPassword')} />
+            <Input label="New password" autoComplete="new-password" hint="Use 15–128 characters." {...field('newPassword')} />
             <Input label="Confirm new password" autoComplete="new-password" {...field('confirmation')} />
           </fieldset>
           <FormFeedback form={form} />
@@ -39,8 +39,8 @@ export default function SecurityForm({ report }) {
         </form>
       </Card>
       <Card>
-        <div className="flex flex-wrap items-center gap-3"><h2 className="text-lg font-semibold">Forgot your password?</h2><Badge>Email setup pending</Badge></div>
-        <p className="mt-3 text-sm leading-7 text-muted">Email OTP recovery will be enabled after email delivery is configured. Password recovery is not available yet.</p>
+        <div className="flex flex-wrap items-center gap-3"><h2 className="text-lg font-semibold">Forgot your password?</h2><Badge>Unavailable</Badge></div>
+        <p className="mt-3 text-sm leading-7 text-muted">Password recovery is currently unavailable.</p>
       </Card>
     </div>
   )

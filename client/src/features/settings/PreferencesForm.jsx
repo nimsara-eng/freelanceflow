@@ -28,7 +28,7 @@ export default function PreferencesForm({ report }) {
   return (
     <Card>
       <h2 className="text-xl font-semibold tracking-tight">Workspace preferences</h2>
-      <p className="mt-2 text-sm leading-6 text-muted">These preferences are saved on this browser. Profile details are saved separately to your account.</p>
+      <p className="mt-2 text-sm leading-6 text-muted">Set your preferred project order, timezone and time format.</p>
       <form onSubmit={(event) => { event.preventDefault(); if (form.dirty) persist(form.draft) }} className="mt-7 space-y-6">
         {fields.map(({ key, label, hint, options }) => <div key={key}><label htmlFor={`preference-${key}`} className="mb-2 block text-sm font-medium">{label}</label><select id={`preference-${key}`} name={key} value={form.draft[key]} onChange={(event) => form.change({ ...form.draft, [key]: event.target.value })} aria-describedby={`preference-${key}-hint`} className="min-h-11 w-full rounded-xl border border-border bg-surface px-3 text-sm">{options.map(([value, text]) => <option key={value} value={value}>{text}</option>)}</select><p id={`preference-${key}-hint`} className="mt-2 text-xs text-muted">{hint}</p></div>)}
         <FormFeedback form={form} />

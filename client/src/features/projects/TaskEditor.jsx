@@ -49,7 +49,7 @@ export default function TaskEditor({ projectId, task, version, onClose, onSaved,
     } finally { locked.current = false; setBusy(false); onBusy(false) }
   }
   return (
-    <Modal open onClose={close} closeOnBackdrop={!busy} size="lg" title={leaving ? busy ? 'Saving your task' : 'Discard this task draft?' : task ? 'Edit task' : 'Create a task'} description={leaving ? 'Your saved tasks will stay in the project.' : 'Small steps make the bigger picture clearer.'} footer={leaving ? <>
+    <Modal open onClose={close} closeOnBackdrop={!busy} size="lg" title={leaving ? busy ? 'Saving your task' : 'Discard this task draft?' : task ? 'Edit task' : 'Create a task'} description={leaving ? 'Unsaved changes will be discarded.' : 'Enter the task details.'} footer={leaving ? <>
       <Button variant="secondary" onClick={() => { setDiscard(false); blocker.reset?.() }}>Keep editing</Button>
       <Button variant="danger" disabled={busy} onClick={() => { onClose(); if (blocker.state === 'blocked') blocker.proceed() }}>Discard changes</Button>
     </> : <><Button variant="secondary" disabled={busy} onClick={close}>Cancel</Button><Button form={formId} type="submit" loading={busy} loadingText="Saving task…" disabled={conflict || (Boolean(task) && !dirty)}>{task ? 'Save task' : 'Create task'}</Button></>}>
@@ -57,12 +57,12 @@ export default function TaskEditor({ projectId, task, version, onClose, onSaved,
         <fieldset disabled={busy} className="space-y-5">
           {error && <p role="alert" className="rounded-2xl border border-danger/25 bg-danger/5 p-4 text-sm leading-7">{error}{conflict && ' Close this draft and use Reload tasks to get the current version.'}</p>}
           <Input label="Task title" name="title" required minLength={2} maxLength={120} autoComplete="off" value={draft.title} onChange={change} placeholder="e.g. Design the homepage" />
-          <div><label htmlFor={`${formId}-description`} className="mb-2 block text-sm font-medium">Task details</label><textarea id={`${formId}-description`} name="description" rows={4} maxLength={2000} value={draft.description} onChange={change} placeholder="What should be delivered in this step?" className="w-full resize-y rounded-xl border border-border bg-surface px-3.5 py-3 text-base sm:text-sm" /><p className="mt-1 text-right text-xs text-muted">{draft.description.length}/2000</p></div>
+          <div><label htmlFor={`${formId}-description`} className="mb-2 block text-sm font-medium">Task details</label><textarea id={`${formId}-description`} name="description" rows={4} maxLength={2000} value={draft.description} onChange={change} placeholder="Task requirements and deliverables" className="w-full resize-y rounded-xl border border-border bg-surface px-3.5 py-3 text-base sm:text-sm" /><p className="mt-1 text-right text-xs text-muted">{draft.description.length}/2000</p></div>
           <div className="grid gap-5 sm:grid-cols-2">
-            <Input label="Task deadline" type="date" name="dueDate" min="1900-01-01" max="2199-12-31" value={draft.dueDate} onInput={change} onChange={change} hint="Optional. Leave blank if this task has no separate deadline." />
+            <Input label="Task deadline" type="date" name="dueDate" min="1900-01-01" max="2199-12-31" value={draft.dueDate} onInput={change} onChange={change} hint="Optional task deadline." />
             <div><label htmlFor={`${formId}-status`} className="mb-2 block text-sm font-medium">Task status</label><select id={`${formId}-status`} name="status" value={draft.status} onChange={change} className="min-h-11 w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-base sm:text-sm"><option value="todo">To do</option><option value="in_progress">In progress</option><option value="done">Done</option></select></div>
           </div>
-          <p className="rounded-2xl bg-surface-2 p-4 text-xs leading-6 text-muted">Task titles, details, deadlines and progress are visible to your accepted client. Completing tasks updates progress; project status is set separately.</p>
+
         </fieldset>
       </form>}
     </Modal>

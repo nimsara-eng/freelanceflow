@@ -24,17 +24,17 @@ function ProfileVisibility({ profile, disabled, onBusy, onChanged }) {
     try {
       const data = await api('/profile/visibility', { method: 'PATCH', body: { visibility } })
       onChanged(data)
-      setMessage(visibility === 'published' ? 'Profile published. Signed-in clients can now find you by ID, profile link or QR code.' : 'Profile unpublished. Clients can no longer find or open it.')
+      setMessage(visibility === 'published' ? 'Profile published.' : 'Profile unpublished.')
     } catch (failure) { setError(failure.message) }
     finally { locked.current = false; setBusy(false); onBusy(false) }
   }
   return (
     <section aria-label="Profile publishing" className="mt-7 space-y-4 rounded-2xl border border-brand/15 bg-brand/5 p-5 sm:p-6">
-      <div className="flex flex-wrap items-center justify-between gap-3"><h3 className="flex items-center gap-2 font-semibold">{published ? <Eye size={19} aria-hidden="true" /> : <EyeOff size={19} aria-hidden="true" />}Profile visibility</h3><Badge tone={published ? 'success' : 'neutral'} dot>{published ? 'Published' : 'Private'}</Badge></div>
-      <p className="text-sm leading-7 text-muted">{published ? 'Signed-in clients can find your saved profile using your freelancer ID, link or QR code. Unpublish to hide it from new lookups.' : 'Your profile is private. Publish it when you are ready for signed-in clients to find you.'}</p>
-      <p className="text-xs leading-6 text-muted">Publishing shares your saved name, photo, bio, professional details and public location. Your email, private address and projects stay private. Resume downloads remain a separate sharing choice.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3"><h3 className="flex items-center gap-2 font-semibold">{published ? <Eye size={19} aria-hidden="true" /> : <EyeOff size={19} aria-hidden="true" />}Profile visibility</h3><Badge tone={published ? 'success' : 'neutral'} dot>{published ? 'Published' : 'Unpublished'}</Badge></div>
+      <p className="text-sm leading-7 text-muted">{published ? 'Published profiles are available through freelancer search, profile links and QR codes.' : 'Publish your profile to appear in client searches.'}</p>
+      <p className="text-xs leading-6 text-muted">Publish your professional profile for client searches. Manage resume sharing separately.</p>
       <div className="flex flex-wrap items-center gap-4"><Button variant={published ? 'secondary' : 'primary'} disabled={disabled} loading={busy} loadingText={published ? 'Unpublishing…' : 'Publishing…'} onClick={toggle}>{published ? 'Unpublish profile' : 'Publish profile'}</Button>{published && <Link to={`/freelancers/${profile.freelancerId}`} className="text-sm font-semibold text-brand hover:underline">View published profile</Link>}</div>
-      {disabled && !busy && <p className="text-xs leading-6 text-muted">Save or discard your unsaved settings and wait for any current save to finish before changing visibility.</p>}
+      {disabled && !busy && <p className="text-xs leading-6 text-muted">Save or discard changes before updating profile visibility.</p>}
       {error && <p role="alert" className="text-sm leading-6 text-danger">{error}</p>}
       {message && <p role="status" className="text-sm leading-6 text-brand">{message}</p>}
     </section>
@@ -68,7 +68,7 @@ export default function ProfessionalProfileForm({ initial, report, publicationDi
   return (
     <Card>
       <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-semibold tracking-tight">Freelancer profile</h2><Badge tone="brand">{profile.freelancerId}</Badge></div>
-      <p className="mt-2 text-sm leading-6 text-muted">Shape how clients see your work. Save your changes, then use the publishing controls below.</p>
+      <p className="mt-2 text-sm leading-6 text-muted">Manage your professional details and profile visibility.</p>
       <form noValidate onSubmit={save} className="mt-7 space-y-6">
         <fieldset disabled={form.busy || publishing} className="space-y-6 disabled:opacity-70">
           <Input label="Professional headline" maxLength={120} placeholder="e.g. Frontend developer & interface designer" {...field('headline')} />
@@ -80,7 +80,7 @@ export default function ProfessionalProfileForm({ initial, report, publicationDi
             <Input label="LinkedIn" type="url" placeholder="https://www.linkedin.com/in/your-name" maxLength={2048} {...field('linkedinUrl')} />
             <Input label="Portfolio website" type="url" placeholder="https://your-portfolio.com" maxLength={2048} {...field('portfolioUrl')} />
           </div>
-          <div className="border-t border-border pt-6"><h3 className="text-sm font-semibold">Public location</h3><p className="mt-2 text-xs leading-6 text-muted">Optional city and country only. Your private address stays separate.</p><div className="mt-5 grid gap-5 sm:grid-cols-2"><Input label="Public city" maxLength={80} {...field('publicCity')} /><Input label="Public country" maxLength={80} {...field('publicCountry')} /></div></div>
+          <div className="border-t border-border pt-6"><h3 className="text-sm font-semibold">Public location</h3><p className="mt-2 text-xs leading-6 text-muted">City and country shown on your published profile.</p><div className="mt-5 grid gap-5 sm:grid-cols-2"><Input label="Public city" maxLength={80} {...field('publicCity')} /><Input label="Public country" maxLength={80} {...field('publicCountry')} /></div></div>
         </fieldset>
         <FormFeedback form={form} />
         <SaveActions form={form} label="Save freelancer profile" />

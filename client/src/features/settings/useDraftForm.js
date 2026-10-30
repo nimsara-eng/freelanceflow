@@ -36,7 +36,7 @@ export function useDraftForm(initial, report) {
     report({ dirty, busy: true })
   }
 
-  function finish(value, text = 'Saved to your account.') {
+  function finish(value, text = 'Changes saved.') {
     setSaved(value)
     setDraft(value)
     setBusy(false)
