@@ -65,6 +65,17 @@ The unit checks need no database. `test:mvp-api` requires the local MongoDB serv
 - If a save/send loses its response, refresh the relevant list before retrying. Mutations are never automatically replayed. Repeated or stale changes return a conflict instead of silently overwriting newer work.
 - Back up the local MongoDB database and private configuration before upgrades. Keep backups outside Git with access restricted to you. A restore should first be checked in a separate local database. Changing the session secret signs existing sessions out; it is not an account-password recovery method.
 
+## Temporary public preview from this computer
+
+```powershell
+cd D:\Projects\SmartFreelanceManagement\server
+npm run public:preview
+```
+
+The Windows x64 launcher builds the React client, downloads a pinned official `cloudflared` release into your local application-data folder and verifies its SHA-256 digest before execution. It starts a separate loopback API/frontend with HTTPS-only session cookies and prints a temporary `https://…trycloudflare.com` URL. Your existing local accounts and database are used; project and file permissions still apply. The development server, private `.env` and MongoDB port are not published. No router port forwarding or Windows service is installed.
+
+Keep the terminal, computer and internet connection running. Press **Ctrl+C in this terminal**, or run **`npm run public:stop`** from another terminal in `server`, to stop public access. The stop command targets only the app-specific Cloudflare tool with a loopback preview URL; the launcher then stops its own API. The hostname changes on each launch; share fresh profile/invitation links from the public URL. Restarting the preview signs its visitors out. This is a temporary demo with no uptime guarantee, not permanent hosting. Email verification and password recovery remain deferred. Run `npm run test:public` from `server` to check production-mode cookies, routes and permissions against an isolated synthetic database; build the client first.
+
 ## Deferred before a public release
 
 Per the current local-MVP scope, **email verification, email OTP/password recovery delivery and hosting are deferred**. Publishing currently does not require email verification and never claims the email is verified. Reintroduce verified-email enforcement when mail delivery is implemented and tested. There is no deployed service, payment integration, production backup automation, or public-release approval in this change. Local QR/profile links work only on the computer hosting the app.
