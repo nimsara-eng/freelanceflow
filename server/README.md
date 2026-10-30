@@ -16,6 +16,6 @@ Check `http://127.0.0.1:5001/api/health`. Run `npm run test:auth` and `npm run t
 
 Sessions use HttpOnly cookies, MongoDB storage and CSRF tokens. Signup derives Client/Freelancer roles on the server. Files are held in private, bounded MongoDB Asset records; supported photo formats are JPEG/PNG/WebP, and resumes must be PDF. Resume download sharing is off initially and resets on replacement.
 
-Email verification and OTP recovery delivery are not configured yet. New freelancer profiles remain private until verified-email publishing is available. Automatic location and real project/prototype collaboration are still pending; workspace project/invoice screens currently identify their sample data.
+Email verification and OTP recovery delivery are deferred for the local MVP. Freelancer profiles are private until explicitly published; publishing currently does not require email verification. The app never marks an unverified email as verified. Projects, collaboration, design reviews, work requests, clients, time records and invoices use persisted data. See the [local MVP guide](../README.md) for the full journeys and current limits. Run `npm run test:all` for all backend unit checks.
 
 Keep `.env` and real credentials private. The development proxy is not a production host; production requires HTTPS and same-origin API routing. QR links use the configured frontend origin; localhost links work only on that computer.

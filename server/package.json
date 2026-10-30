@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:mvp-api": "node test/run-local-mvp.mjs",
+    "test:all": "node --test test/*.test.js",
+    "test:mvp": "node --test test/local-mvp.test.js",
+    "test": "node --test test/*.test.js",
     "dev": "node --watch server.js",
     "start": "node server.js",
     "test:auth": "node --test test/auth-foundation.test.js",
