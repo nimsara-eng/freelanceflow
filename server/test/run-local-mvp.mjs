@@ -19,15 +19,17 @@ await new Promise((resolve, reject) => {
 const port = socket.address().port
 await new Promise((resolve) => socket.close(resolve))
 const serverFile = fileURLToPath(new URL('../server.js', import.meta.url))
+const publicPreview = process.argv[2] === 'public'
 const api = spawn(process.execPath, [serverFile], {
   cwd: empty,
   windowsHide: true,
   env: {
     ...process.env,
-    NODE_ENV: 'test',
+    NODE_ENV: publicPreview ? 'production' : 'test',
+    SERVE_CLIENT: publicPreview ? 'true' : 'false',
     PORT: String(port),
     MONGODB_URI: uri,
-    CLIENT_URL: 'http://127.0.0.1:5174',
+    CLIENT_URL: publicPreview ? 'https://preview.example.invalid' : 'http://127.0.0.1:5174',
     SESSION_SECRET: randomBytes(48).toString('hex'),
   },
   stdio: ['ignore', 'pipe', 'pipe'],
@@ -63,7 +65,7 @@ try {
   })
   const check = spawn(
     process.execPath,
-    [fileURLToPath(new URL(process.argv[2]==='approvals'?'./approvals-api.check.mjs':'./mvp-api.check.mjs', import.meta.url))],
+    [fileURLToPath(new URL(publicPreview ? './public-preview-api.check.mjs' : process.argv[2]==='approvals'?'./approvals-api.check.mjs':'./mvp-api.check.mjs', import.meta.url))],
     {
       cwd: empty,
       windowsHide: true,

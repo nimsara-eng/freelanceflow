@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "public:preview": "node scripts/public-preview.mjs",
+    "public:stop": "powershell -NoProfile -File scripts/Stop-PublicPreview.ps1",
+    "test:public": "node test/run-local-mvp.mjs public",
     "test:approvals": "node test/run-local-mvp.mjs approvals",
     "test:mvp-api": "node test/run-local-mvp.mjs",
     "test:all": "node --test test/*.test.js",
